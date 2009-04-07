@@ -1,0 +1,17 @@
+Extension : paradoxpdf
+Requires  : eZ Publish 4.x.x (not tested on 3.X but can be easily customised for)
+Authors   : Mohamed Karnichi karnichi[at]gmail[dot]com
+
+
+Coming soon :
+
+ - Printing Content as PNG  (can be used to generate png images to beloaded from flash application)
+ - Fixin Relative urls to make links work
+ - Provide a way for Handling custom module views export
+ - Check correct view execution before generating PDFS (to avoid printing ezpublish errors pages as pdf)
+
+ Known issues:
+
+ -Please post all your issues on the project forum :http://projects.ez.no/paradoxpdf/forum
+
+
