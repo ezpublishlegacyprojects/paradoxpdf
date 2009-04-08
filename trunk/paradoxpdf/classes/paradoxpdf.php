@@ -133,6 +133,7 @@ class ParadoxPDF
         if (!(eZFileHandler::doExists($tmpPDFFile) && filesize($tmpPDFFile)))
         {
             eZDebug::writeWarning("Failed executing: $command, Error code: $returnCode", 'ParadoxPDF::generatePDF');
+            eZLog::write("Failed executing command: $command, Error code: $returnCode",'paradoxpdf.log');
         }
         else
         {
