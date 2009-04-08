@@ -119,7 +119,14 @@ paradoxpdf operator :
 
             The above example sets the width of the page box to be 297mm and the height to be 210mm. The page box in this example should be rendered on a page sheet size of 210 mm by 297 mm.
 
-Issues:
-------
--Make sure that folder paradoxpdf/tmp is writable (chmod 775)
-Please post your questions on the project forum :   http://projects.ez.no/paradoxpdf/forum
+Debug and Issues:
+-----------------
+-First make sure that folder paradoxpdf/tmp is writable (chmod 775)
+-checkout the latest version of extension
+-enable debug in paradox/settings/paradoxpdf.ini
+-cleare the cache (with --purge option)
+-regenerate pdf throw content/view/pdf/<node_id>
+-check files on paradox/tmp
+-get the command on log file : var/log/paradoxpdf.log
+-execute the command manually at the root folder of your ezpublish installation
+-post the output result on the forum  http://projects.ez.no/paradoxpdf/forum/issues
