@@ -12,6 +12,7 @@ installation instructions for JRE as described on the Java home pages.
 Installation :
 
 -copy paradoxpdf in extension directory
+-make sure that folder paradoxpdf/tmp is writable (chmod 775)
 -In  settings/paradoxpdf.ini set your java executable path :
     [BinarySettings]
     JavaExecutable=/usr/bin/java
