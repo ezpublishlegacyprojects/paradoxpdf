@@ -1,0 +1,14 @@
+Extension : paradoxpdf
+Requires  : eZ Publish 4.x.x (not tested on 3.X but can be easily customised for)
+Author    : Mohamed Karnichi karnichi[at]gmail[dot]com
+
+
+Specs :
+
+    -Enabling ezpublish to Serve PDF version of Web content
+    -It has to be simple for developpers (no learning curve)
+    -Have to be performant
+    -Cache management : use ezpublish caching mechanisme
+    -Features and things to note:
+        * multiple exports can be requested concurrently
+        * platforme independent

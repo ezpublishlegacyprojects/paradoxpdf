@@ -1,0 +1,21 @@
+Extension : paradoxpdf
+Requires  : eZ Publish 4.x.x (not tested on 3.X but can be easily customised for)
+Author    : Mohamed Karnichi karnichi[at]gmail[dot]com
+
+Requirements:
+
+-The extension requires the Java Runtime Environment (JRE) version 1.6. (FIXME: rebuild paradoxpdf.jar and make it 1.5  compatible (for ezFind users))
+This can be obtained from the Java download pages. Follow the
+installation instructions for JRE as described on the Java home pages.
+
+
+Installation :
+
+-copy paradoxpdf in extension directory
+-In  settings/paradoxpdf.ini set your java executable path :
+    [BinarySettings]
+    JavaExecutable=/usr/bin/java
+
+-enable the extension in site.ini
+
+-Clear the cache
