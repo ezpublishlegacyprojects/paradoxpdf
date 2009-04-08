@@ -46,16 +46,10 @@ class ParadoxPDF
     static function exportPDF($xhtml, $pdf_file_name = 'file', $keys, $subtree_expiry, $expiry = 0, $ignore_content_expiry = false)
     {
 
-        if(!isset($subtree_expiry))
+        if($pdf_file_name == '')
         {
-            eZDebug::writeError("The subtree_expiry parametter is required", 'ParadoxPDF::exportPDF');
+            $pdf_file_name = 'file';
         }
-
-        if($pdf_file_name=='')
-        {
-            $pdf_file_name='file';
-        }
-
 
         $ini = eZINI::instance();
         $paradoxPDFINI = eZINI::instance('paradoxpdf.ini');

@@ -31,7 +31,7 @@
 
   Usage :
         -Full : paradoxpdf($xhtml, $pdf_file_name, $keys, $subtree_expiry, $expiry , $ignore_content_expiry)
-        -Minium : paradoxpdf($xhtml, $pdf_file_name, $keys, $subtree_expiry)
+        -Minium : paradoxpdf($xhtml)
 
   Parameters :
         $xhtml : (required)

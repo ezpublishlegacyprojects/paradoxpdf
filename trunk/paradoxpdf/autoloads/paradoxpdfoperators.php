@@ -53,10 +53,10 @@ class ParadoxPDFOperators
                                                                    'default' => 'file'
                                                                    ),
                                                'keys' => array( 'type' => 'mixed',
-                                                               'required' => true
+                                                               'required' => false
                                                                    ),
                                                'subtree_expiry' => array( 'type' => 'string',
-                                                                  'required' =>true
+                                                                  'required' =>false
                                                                    ),
                                                'expiry' => array( 'type' => 'int',
                                                               'required' =>false
