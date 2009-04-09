@@ -10,9 +10,23 @@ More documentation well be provided soon
 
 Make link to pdf view :
 ----------------------
--Actualy there are two ways :
+-For node content actualy there are two ways :
+
     - point to : content/view/pdf/<nodeID>
                   this wil automatically load the pdf_export_layout
+                  example : content/view/pdf/2
+    - if you are concerned by SEO you cans use  layout/set/pdf/<url_alias>
+                  example : layout/set/pdf/Home
+            (be carefull with this aproach the node/view/full templates will be used instead of node/view/pdf)
+
+
+-For module views:
+
+    - point to : layout/set/pdf/<module_name>/<module_view>/<extra-params>
+               example : layout/set/mymodule/myview/fixedparamter1/(viewparameter1_name)/viewparameter1_value
+
+    - or set directly the layout on your module view:
+                $Result['pagelayout'] = 'paradoxpdf_layout.tpl';
 
 
 Cusotmize pdf View :
