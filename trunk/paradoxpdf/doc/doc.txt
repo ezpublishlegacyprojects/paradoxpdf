@@ -24,7 +24,7 @@ Cusotmize pdf View :
 PDF cache :
 -----------
 PDF cache is handled uses the template-bloc cache mechanism. You can customize it just as a template cache bloc
-to refresh the cas use php/bin/php/ezcache with the --purge option
+to refresh the cash use php/bin/php/ezcache.php with the --purge option
  For more information please refere   to online documentation :
   http://ez.no/doc/ez_publish/technical_manual/4_0/reference/template_functions/miscellaneous/cache_block
 
@@ -35,7 +35,7 @@ paradoxpdf operator :
         -Minium : paradoxpdf($xhtml)
 
   Parameters :
-        $xhtml $keys, $subtree_expiry: are required
+        $xhtml :required
         $pdf_file_name : just the name (without .pdf extension) that will be assigned to generated file during download
                        if not given "file.pdf" will be used
         $keys, $subtree_expiry, $expiry , $ignore_content_expiry : controls cache (see cache-block documentation)
@@ -126,7 +126,7 @@ Debug and Issues:
 -enable debug in paradox/settings/paradoxpdf.ini
 -cleare the cache (with --purge option)
 -regenerate pdf throw content/view/pdf/<node_id>
--check files on paradox/tmp
+-check files on paradoxpdf/tmp
 -get the command on log file : var/log/paradoxpdf.log
 -execute the command manually at the root folder of your ezpublish installation
 -post the output result on the forum  http://projects.ez.no/paradoxpdf/forum/issues
