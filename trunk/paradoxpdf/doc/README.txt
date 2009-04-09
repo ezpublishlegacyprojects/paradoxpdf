@@ -5,11 +5,13 @@ Authors   : Mohamed Karnichi karnichi[at]gmail[dot]com
 
 What is ParadoxPDF?
 -------------------
+
 ParadoxPDF is an ezpublish extension thant provides a realy easy way to serve your content as PDF files.
 It'is platform independant, easy to use and performant.
 
 Why ParadoxPDF?
--------------------
+---------------
+
 I Love eZPublish. As you know PDF support is deprecated. So we need a handy way to serve content as PDF files.
 As Ihave left my curret Emplyer, I have time to make some useful things :
 ParadoxPDF is a simple and efficient way to generate pdf files from xhtml+CSS.
@@ -17,6 +19,7 @@ ParadoxPDF is a simple and efficient way to generate pdf files from xhtml+CSS.
 
 License
 -------
+
 This program is free software; you can redistribute it and/or
 modify it under the terms of version 3.0  of the GNU General
 Public License as published by the Free Software Foundation.
@@ -40,6 +43,7 @@ http://today.java.net/pub/a/today/2007/06/26/generating-pdfs-with-flying-saucer-
 
 ParadoxPDF features
 -------------------
+
 ParadoxPDF Provides All features of Flying Saucer AS :
 
     * Platfom independent : 100% Java XML+CSS layout engine with native PDF output.
@@ -58,8 +62,16 @@ In Plus :
 
 Installation
 ------------
+
 Read doc/install.txt
 Look at the comments and sample code in design/templates/paradox_pdf_layout.tpl
+
+Requirements
+------------
+
+-The extension requires the Java Runtime Environment (JRE) version 1.4 or above
+This can be obtained from the Java download pages. Follow the
+installation instructions for JRE as described on the Java home pages.
 
 
 Where to get more help

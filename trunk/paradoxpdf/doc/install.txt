@@ -4,7 +4,7 @@ Author    : Mohamed Karnichi karnichi[at]gmail[dot]com
 
 Requirements:
 
--The extension requires the Java Runtime Environment (JRE) version 1.6. (FIXME: rebuild paradoxpdf.jar and make it 1.5  compatible (for ezFind users))
+-The extension requires the Java Runtime Environment (JRE) version 1.4 or above
 This can be obtained from the Java download pages. Follow the
 installation instructions for JRE as described on the Java home pages.
 
