@@ -45,7 +45,6 @@ class ParadoxPDF
 
     static function exportPDF($xhtml, $pdf_file_name = 'file', $keys, $subtree_expiry, $expiry = 0, $ignore_content_expiry = false)
     {
-
         if($pdf_file_name == '')
         {
             $pdf_file_name = 'file';
@@ -63,6 +62,12 @@ class ParadoxPDF
         if ($data instanceof eZClusterFileFailure)
         {
             $data = self::generatePDF($xhtml);
+
+            // check if error aquired during pdf generation
+            if($data === false)
+            {
+                return;
+            }
             $handler->storeCache(array('scope'      => 'template-block',
                                          'binarydata' => $data));
         }
@@ -78,7 +83,7 @@ class ParadoxPDF
      * Converts xhtml to pdf
      *
      * @param $xhtml
-     * @return Binary pdf content
+     * @return Binary pdf content or False if error during pdf generation
      */
     static function generatePDF($xhtml)
     {
@@ -97,10 +102,18 @@ class ParadoxPDF
         $tmpXHTMLFile = $tmpDir.$sep.$rand.'.xhtml';
         $tmpPDFFile = $tmpDir.$sep.$rand.'.pdf';
 
+        //check if $tmpdir is writable
+        if(!eZFileHandler::doIsWriteable($tmpDir))
+        {
+            eZDebug::writeWarning("ParadoxPDF::generatePDF Error : please make $tmpDir writable ", 'ParadoxPDF::generatePDF');
+            eZLog::write("ParadoxPDF::generatePDF Error : please make $tmpDir writable ",'paradoxpdf.log');
+
+            return false;
+        }
+
         //fix relative urls to match ez root directory
         $xhtml = self::fixURL($xhtml);
 
-        //TODO : should we use ezFileHandler instead here for temporary files ?
         eZFile::create($tmpXHTMLFile, false, $xhtml) ;
 
         $pdfConent = '';
@@ -108,32 +121,40 @@ class ParadoxPDF
         //run jar in headless mode
         $command = "$javaExec -Djava.awt.headless=true -jar $paradoxPDFExec $tmpXHTMLFile $tmpPDFFile";
 
-        //FIXME : when redirect stdout and stderr to a log file using system,
-        //        this sends garbage content to browser
 
-        /*
-         if($debugEnabled)
-         {
-         $varDir = $ini->variable('FileSettings', 'VarDir');
-         $logDir = $ini->variable('FileSettings', 'LogDir');
-         $logName = 'paradoxpf.log';
-         $DebugFileName = eZSys::rootDir(). $sep. $varDir . $sep . $logDir . $sep . $logName;
-         $command .= " 2>&1 > $DebugFileName";
-         }
-         */
 
-        if(eZSys::osType() == 'win32') $command = "\"$systemString\"";
+        if(eZSys::osType() == 'win32')
+        {
+            $command = "\"$systemString\"";
+        }
+        else
+        {
+            if($debugEnabled)
+            {
+                //fix to get command output result on *unix systems
+                $command .= '  2>&1';
+            }
+
+        }
 
         //Enter the Matrix
-
-        $result = system($command, $returnCode);
+        exec($command, $output, $returnCode);
 
         //Cant trust java return code so we test if a plain pdf file is genereated
-
         if (!(eZFileHandler::doExists($tmpPDFFile) && filesize($tmpPDFFile)))
         {
             eZDebug::writeWarning("Failed executing: $command, Error code: $returnCode", 'ParadoxPDF::generatePDF');
             eZLog::write("Failed executing command: $command, Error code: $returnCode",'paradoxpdf.log');
+
+            //log paradoxpdf.jar output if debug mode enabled
+
+            if($debugEnabled)
+            {
+                $logMessage = implode("\n",$output);
+                eZLog::write("Output : $logMessage",'paradoxpdf.log');
+            }
+
+            return false;
         }
         else
         {
@@ -141,7 +162,6 @@ class ParadoxPDF
         }
 
         //cleanup temporary files
-
         //if debug enabled preseves the temporary pdf file
         //else remove all temporary files
 
