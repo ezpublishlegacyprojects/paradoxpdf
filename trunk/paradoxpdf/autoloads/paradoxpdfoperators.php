@@ -1,6 +1,6 @@
 <?php
 /**
- * ParadoxPDF
+ * ParadoxPDFOperators
  *
  * PHP version 5
  *
@@ -10,7 +10,7 @@
  * @copyright 2009 Mohamed Karnichi
  * @license   http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License V2
  * @version   $Id$
- * @link      http://svn.projects.ez.no/paradoxpdf
+ * @link      http://projects.ez.no/paradoxpdf
  */
 
 // This program is free software; you can redistribute it and/or modify

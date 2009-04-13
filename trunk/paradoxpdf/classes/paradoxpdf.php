@@ -10,7 +10,7 @@
  * @copyright 2009 Mohamed Karnichi
  * @license   http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License V2
  * @version   $Id$
- * @link      http://svn.projects.ez.no/paradoxpdf
+ * @link      http://projects.ez.no/paradoxpdf
  */
 
 // This program is free software; you can redistribute it and/or modify
@@ -34,7 +34,7 @@ class ParadoxPDF
     /**
      * Performs PDF content generation and caching
      *
-     * @param $xhtml                xhtml content
+     * @param $xhtml                XHTML content
      * @param $pdf_file_name        name that will be used when serving the PDF file
      * @param $keys                 keys for Cache key(s) - either as a string or an array of strings
      * @param $subtree_expiry       A subtree that expires the pdf file.
@@ -43,12 +43,16 @@ class ParadoxPDF
      * @return void
      */
 
-    static function exportPDF($xhtml, $pdf_file_name = 'file', $keys, $subtree_expiry, $expiry = 0, $ignore_content_expiry = false)
+    static function exportPDF($xhtml, $pdf_file_name = 'file', $keys = array(), $subtree_expiry, $expiry, $ignore_content_expiry)
     {
         if($pdf_file_name == '')
         {
             $pdf_file_name = 'file';
         }
+
+        $use_global_expiry = !$ignore_content_expiry;
+
+        $keys = self::getCacheKeysArray($keys);
 
         $ini = eZINI::instance();
         $paradoxPDFINI = eZINI::instance('paradoxpdf.ini');
@@ -57,18 +61,18 @@ class ParadoxPDF
 
         $expiry = ($expiry) ? $expiry : $paradoxPDFINI->variable('CacheSettings','TTL');
 
-        list($handler, $data) = eZTemplateCacheBlock::retrieve($keys, $subtree_expiry, $expiry, $ignore_content_expiry);
+        list($handler, $data) = eZTemplateCacheBlock::retrieve($keys, $subtree_expiry, $expiry, $use_global_expiry);
 
         if ($data instanceof eZClusterFileFailure)
         {
             $data = self::generatePDF($xhtml);
 
-            // check if error aquired during pdf generation
+            // check if error occurred during pdf generation
             if($data === false)
             {
                 return;
             }
-            $handler->storeCache(array('scope'      => 'template-block',
+            $handler->storeCache(array(  'scope'      => 'template-block',
                                          'binarydata' => $data));
         }
 
@@ -83,7 +87,7 @@ class ParadoxPDF
      * Converts xhtml to pdf
      *
      * @param $xhtml
-     * @return Binary pdf content or False if error during pdf generation
+     * @return Binary pdf content of false if error
      */
     static function generatePDF($xhtml)
     {
@@ -161,6 +165,12 @@ class ParadoxPDF
             $pdfContent = eZFile::getContents($tmpPDFFile);
         }
 
+        eZLog::write("Failed executing command: $command, Error code: $returnCode",'paradoxpdf.log');
+
+
+        $logMessage = implode("\n",$output);
+        eZLog::write("Output : $logMessage",'paradoxpdf.log');
+
         //cleanup temporary files
         //if debug enabled preseves the temporary pdf file
         //else remove all temporary files
@@ -207,6 +217,49 @@ class ParadoxPDF
         eZExecution::cleanExit();
         return;
     }
+
+
+    /**
+     *  Generate cache  key array based on current user roles, requested url, layout
+     *
+     * @param $userKeys
+     * @return array
+     */
+
+    static function getCacheKeysArray( $userKeys )
+    {
+
+        if(!is_array($userKeys))
+        {
+            $userKeys = array($userKeys);
+        }
+
+        $user = eZUser::currentUser();
+        $limitedAssignmentValueList = $user->limitValueList();
+        $roleList = $user->roleIDList();
+        $discountList = eZUserDiscountRule::fetchIDListByUserID( $user->attribute( 'contentobject_id' ) );
+        $currentSiteAccess = ( isset( $GLOBALS['eZCurrentAccess']['name'] ) ) ? $GLOBALS['eZCurrentAccess']['name']:false ;
+        $res = eZTemplateDesignResource::instance();
+        $keys = $res->keys();
+        $layout= ( isset( $keys['layout'] ) ) ? $keys['layout'] : false;
+        $uri = eZURI::instance( eZSys::requestURI() );
+        $actualRequestedURI = $uri->uriString();
+        $userParameters = $uri->userParameters();
+
+        $cacheKeysArray = array('paradoxpdf',
+                                $currentSiteAccess,
+                                $layout,
+                                $actualRequestedURI,
+                                implode( '.', $userParameters ),
+                                implode( '.', $roleList ),
+                                implode( '.', $limitedAssignmentValueList),
+                                implode( '.', $discountList ),
+                                implode( '.', $userKeys ));
+
+        return $cacheKeysArray;
+
+    }
+
 
 
     /**

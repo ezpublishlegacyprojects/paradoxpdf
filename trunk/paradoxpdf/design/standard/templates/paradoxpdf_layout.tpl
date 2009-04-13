@@ -18,7 +18,6 @@
 <div id="header">{*Put the header contents here so it well be present on all page on multipage context*}</div>
 {$module_result.content}
 <div id="footer"> <span id="pagenumber"/> / <span id="pagecount"/> </div>{*the footer will be automatically placed at the end of each page*}
-
 </body>
 </html>
 {/set-block}

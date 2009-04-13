@@ -32,15 +32,9 @@ Make link to pdf view :
 Cusotmize pdf View :
 --------------------
 
-   -You can customize the pdf view just as any html view : just override the view pdf
+   -You can customize the pdf view just as any html view : just override the node/view/pdf.tpl
    -Fore more information look in : design/templates/pdf_export_layout.tpl
 
-PDF cache :
------------
-PDF cache is handled uses the template-bloc cache mechanism. You can customize it just as a template cache bloc
-to refresh the cash use php/bin/php/ezcache.php with the --purge option
- For more information please refere   to online documentation :
-  http://ez.no/doc/ez_publish/technical_manual/4_0/reference/template_functions/miscellaneous/cache_block
 
 paradoxpdf operator :
 --------------------
@@ -53,6 +47,30 @@ paradoxpdf operator :
         $pdf_file_name : just the name (without .pdf extension) that will be assigned to generated file during download
                        if not given "file.pdf" will be used
         $keys, $subtree_expiry, $expiry , $ignore_content_expiry : controls cache (see cache-block documentation)
+
+PDF cache :
+-----------
+PDF cache uses the template-bloc cache mechanism. You can customize it just as a template cache bloc
+to refresh the cash use php/bin/php/ezcache.php with the --purge option
+For more information please refere   to online documentation :
+http://ez.no/doc/ez_publish/technical_manual/4_0/reference/template_functions/miscellaneous/cache_block
+
+By default a key is generated using following parameters :
+ -Current Site Access
+ -Current Layout
+ -Actual Requested URI
+ -User Parameters
+ -User Role List
+ -User Limited Assignment List
+ -User Discount List
+
+If a keys parameter is provided through the template operator paradoxpdf it will be appended to this default keys
+for example if you want to cache the pdf content per user :
+
+{def $pdf_file_name  = $module_result.content_info.url_alias|explode('/')|reverse|extract(0)[0]
+     $keys           = array($current_user.contentobject_id)
+}
+{paradoxpdf($xhtml,$pdf_file_name, $keys)}
 
 
 
@@ -140,4 +158,4 @@ Debug and Issues:
 -enable debug in paradox/settings/paradoxpdf.ini
 -cleare the cache (with --purge option)
 -regenerate pdf throw content/view/pdf/<node_id>
--post the output result on the forum  http://projects.ez.no/paradoxpdf/forum/issues
+-post the output result logged in var/log/paradoxpdf.log on the forum  http://projects.ez.no/paradoxpdf/forum/issues

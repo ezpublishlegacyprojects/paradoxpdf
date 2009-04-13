@@ -7,7 +7,7 @@ Coming soon :
 
  - Printing Content as PNG  (can be used to generate png images to beloaded from flash application)
  - Fixin Relative urls to make links work
- - Check correct view execution before generating PDFS (to avoid printing ezpublish errors pages as pdf)
+ - Check correct view execution before generating PDFS (to avoid printing ezpublish errors pages in pdf)
 
  Known issues:
 
