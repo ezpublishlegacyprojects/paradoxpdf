@@ -125,20 +125,14 @@ class ParadoxPDF
         //run jar in headless mode
         $command = "$javaExec -Djava.awt.headless=true -jar $paradoxPDFExec $tmpXHTMLFile $tmpPDFFile";
 
-
-
         if(eZSys::osType() == 'win32')
         {
             $command = "\"$systemString\"";
         }
         else
         {
-            if($debugEnabled)
-            {
-                //fix to get command output result on *unix systems
-                $command .= '  2>&1';
-            }
-
+            //fix to get command output result on *nix systems
+            $command .= '  2>&1';
         }
 
         //Enter the Matrix
@@ -147,29 +141,13 @@ class ParadoxPDF
         //Cant trust java return code so we test if a plain pdf file is genereated
         if (!(eZFileHandler::doExists($tmpPDFFile) && filesize($tmpPDFFile)))
         {
-            eZDebug::writeWarning("Failed executing: $command, Error code: $returnCode", 'ParadoxPDF::generatePDF');
-            eZLog::write("Failed executing command: $command, Error code: $returnCode",'paradoxpdf.log');
-
-            //log paradoxpdf.jar output if debug mode enabled
-
-            if($debugEnabled)
-            {
-                $logMessage = implode("\n",$output);
-                eZLog::write("Output : $logMessage",'paradoxpdf.log');
-            }
-
+            self::writeCommandLog($command, $output, false);
             return false;
         }
-        else
-        {
-            $pdfContent = eZFile::getContents($tmpPDFFile);
-        }
 
-        eZLog::write("Failed executing command: $command, Error code: $returnCode",'paradoxpdf.log');
+        self::writeCommandLog($command, $output, true);
 
-
-        $logMessage = implode("\n",$output);
-        eZLog::write("Output : $logMessage",'paradoxpdf.log');
+        $pdfContent = eZFile::getContents($tmpPDFFile);
 
         //cleanup temporary files
         //if debug enabled preseves the temporary pdf file
@@ -222,7 +200,7 @@ class ParadoxPDF
     /**
      *  Generate cache  key array based on current user roles, requested url, layout
      *
-     * @param $userKeys
+     * @param $userKeys Array
      * @return array
      */
 
@@ -247,16 +225,43 @@ class ParadoxPDF
         $userParameters = $uri->userParameters();
 
         $cacheKeysArray = array('paradoxpdf',
-                                $currentSiteAccess,
-                                $layout,
-                                $actualRequestedURI,
-                                implode( '.', $userParameters ),
-                                implode( '.', $roleList ),
-                                implode( '.', $limitedAssignmentValueList),
-                                implode( '.', $discountList ),
-                                implode( '.', $userKeys ));
+        $currentSiteAccess,
+        $layout,
+        $actualRequestedURI,
+        implode( '.', $userParameters ),
+        implode( '.', $roleList ),
+        implode( '.', $limitedAssignmentValueList),
+        implode( '.', $discountList ),
+        implode( '.', $userKeys ));
 
         return $cacheKeysArray;
+
+    }
+
+    /**
+     *  Log execution output
+     *
+     * @param $command String executed command
+     * @param $output Array command execution output
+     * @return Void
+     */
+
+    static function writeCommandLog($command, $output, $status=false)
+    {
+
+        $paradoxPDFINI = eZINI::instance('paradoxpdf.ini');
+        $debugEnabled = ($paradoxPDFINI->variable('DebugSettings', 'DebugPDF') == 'enabled');
+        $logMessage = implode("\n", $output);
+
+        if(!$status)
+        {
+            eZDebug::writeError("An error occured during pdf generation please check var/log/paradoxpdf.log", 'ParadoxPDF::generatePDF');
+            eZLog::write("Failed executing command : $command , \n Output : $logMessage",'paradoxpdf.log');
+        }
+        elseif($debugEnabled)
+        {
+            eZLog::write("ParadoxPDF : PDF conversion successful: $command , \n Output : $logMessage",'paradoxpdf.log');
+        }
 
     }
 
@@ -265,13 +270,13 @@ class ParadoxPDF
     /**
      *  Make image and css urls relative to ezpublish root directory
      *
-     * @param $html
+     * @param $html String
      * @return String html with fixed urls
      */
 
     static function fixURL($html)
     {
-        $htmlfixed = preg_replace('#(href|src)=("|\')(.*\.(css|img|js))("|\')#', '$1="../../..$3"', $html);
+        $htmlfixed = preg_replace('#(href|src)=("|\')(.*\.(css|img|js))("|\')#i', '$1="../../..$3"', $html);
         return $htmlfixed;
     }
 

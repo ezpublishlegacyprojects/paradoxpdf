@@ -23,6 +23,9 @@
 </html>
 {/set-block}
 
+{* Avoid printing debug on pdf files when debug enabled *}
+<!-- DEBUG_REPORT -->
+
 {*******************************************************************************************************
   You can tweak the pdf cache just as a template cache-block it's
   based on the same mecanisme. So for more information please refere
