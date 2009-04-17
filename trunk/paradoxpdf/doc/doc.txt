@@ -73,6 +73,15 @@ for example if you want to cache the pdf content per user :
 {paradoxpdf($xhtml,$pdf_file_name, $keys)}
 
 
+-image handling and the Cluster mode
+ ------------------------------------
+
+By default paradoxpdf handles relative images and css uri.
+But Just notice that the simplest way to have links and images working in your pdf, is to set the absolute uri to them.
+The XHTML rendrer will try to load them through HTTP. By this way paradoxpdf can handle ressources stored in Cluster mode.
+If you choose this way, please make sure that your server firewall configuration enables connections through the port 80
+
+TODO ( Add an extra parameter that sets the base url (SiteUrl) to update all relative urls to absolute by appending this base)
 
 -How do you control page size and margin?
  ----------------------------------------
