@@ -276,7 +276,7 @@ class ParadoxPDF
 
     static function fixURL($html)
     {
-        $htmlfixed = preg_replace('#(href|src)=("|\')(.*\.(css|img|js))("|\')#i', '$1="../../..$3"', $html);
+        $htmlfixed = preg_replace('#(href|src)\s*=\s*["\'](?!https?|mailto)(.*)["\']#i', '$1="../../..$2"', $html);
         return $htmlfixed;
     }
 
