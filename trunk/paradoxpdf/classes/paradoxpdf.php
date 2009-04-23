@@ -125,11 +125,7 @@ class ParadoxPDF
         //run jar in headless mode
         $command = "$javaExec -Djava.awt.headless=true -jar $paradoxPDFExec $tmpXHTMLFile $tmpPDFFile";
 
-        if(eZSys::osType() == 'win32')
-        {
-            $command = "\"$systemString\"";
-        }
-        else
+        if(eZSys::osType() != 'win32')
         {
             //fix to get command output result on *nix systems
             $command .= '  2>&1';
@@ -147,7 +143,7 @@ class ParadoxPDF
 
         self::writeCommandLog($command, $output, true);
 
-        $pdfContent = eZFile::getContents($tmpPDFFile);
+        $pdfContent = file_get_contents($tmpPDFFile); //thanks to Damien Pobel
 
         //cleanup temporary files
         //if debug enabled preseves the temporary pdf file
