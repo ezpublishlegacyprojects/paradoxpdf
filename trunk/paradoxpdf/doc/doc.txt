@@ -3,11 +3,6 @@ Requires  : eZ Publish 4.x.x (not tested on 3.X but can be easily customised for
 Author    : Mohamed Karnichi karnichi[at]gmail[dot]com
 
 
-More documentation well be provided soon
-
-
-
-
 Make link to pdf view :
 ----------------------
 -For node content actualy there are two ways :
@@ -19,11 +14,10 @@ Make link to pdf view :
                   example : layout/set/pdf/Home
             (be carefull with this aproach the node/view/full templates will be used instead of node/view/pdf)
 
-
 -For module views:
 
     - point to : layout/set/pdf/<module_name>/<module_view>/<extra-params>
-               example : layout/set/mymodule/myview/fixedparamter1/(viewparameter1_name)/viewparameter1_value
+               example : layout/set/pdf/mymodule/myview/fixedparamter1/(viewparameter1_name)/viewparameter1_value
 
     - or set directly the layout on your module view:
                 $Result['pagelayout'] = 'paradoxpdf_layout.tpl';
@@ -52,7 +46,7 @@ PDF cache :
 -----------
 PDF cache uses the template-bloc cache mechanism. You can customize it just as a template cache bloc
 to refresh the cash use php/bin/php/ezcache.php with the --purge option
-For more information please refere   to online documentation :
+For more information please refere to online documentation :
 http://ez.no/doc/ez_publish/technical_manual/4_0/reference/template_functions/miscellaneous/cache_block
 
 By default a key is generated using following parameters :
