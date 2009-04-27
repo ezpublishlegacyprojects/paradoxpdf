@@ -6,7 +6,7 @@
  *
  * @category  PHP
  * @package   ParadoxPDF
- * @author    Mohamed Karnichi <karnichi[@]gmail.com>
+ * @author    Mohamed Karnichi <www.tricinty.com>
  * @copyright 2009 Mohamed Karnichi
  * @license   http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License V2
  * @version   $Id$
@@ -45,48 +45,37 @@ class ParadoxPDFOperators
 
     function namedParameterList()
     {
-        return array(  'paradoxpdf' => array( 'xhtml' =>  array( 'type' => 'string',
-                                                                  'required' => true
-                                                                ),
-                                               'pdf_file_name' => array( 'type' => 'string',
-                                                               'required' => false,
-                                                                   'default' => 'file'
-                                                                   ),
-                                               'keys' => array( 'type' => 'mixed',
-                                                               'required' => false
-                                                                   ),
-                                               'subtree_expiry' => array( 'type' => 'string',
-                                                                  'required' =>false
-                                                                   ),
-                                               'expiry' => array( 'type' => 'int',
-                                                              'required' =>false
-                                                                   ),
-                                               'ignore_content_expiry' => array( 'type' => 'boolean',
-                                                                       'required' =>false
-                                                                   )));
+        return array(  'paradoxpdf' => array('paradoxpdf_params' => array( 'type'     => 'array',
+                                                                           'required' => true
+                                                                         )));
     }
 
     function modify( $tpl, $operatorName, $operatorParameters, $rootNamespace,
     $currentNamespace, &$operatorValue, $namedParameters )
     {
-        $result = '';
+        $params = $namedParameters['paradoxpdf_params'];
+
 
         switch ( $operatorName )
         {
             case 'paradoxpdf':
                 {
-                    $xhtml = $namedParameters['xhtml'];
-                    $pdf_file_name = $namedParameters['pdf_file_name'];
-                    $keys = $namedParameters['keys'];
-                    $subtree_expiry = $namedParameters['subtree_expiry'];
-                    $expiry = $namedParameters['expiry'];
-                    $ignore_content_expiry = $namedParameters['ignore_content_expiry'];
-                    $result = ParadoxPDF::exportPDF( $xhtml, $pdf_file_name,$keys, $subtree_expiry, $expiry, $ignore_content_expiry ) ;
+                    $xhtml                 = isset($params['xhtml'])?$params['xhtml'] : '';
+                    $pdf_file_name         = isset($params['pdf_file_name'])?$params['pdf_file_name'] : '' ;
+                    $keys                  = isset($params['keys'])? $params['keys'] : array();
+                    $subtree_expiry        = isset($params['subtree_expiry'])?$params['subtree_expiry'] : '';
+                    $expiry                = isset($params['expiry'])?$params['expiry'] : null ;
+                    $ignore_content_expiry = isset($params['ignore_content_expiry'])?$params['ignore_content_expiry'] : false;
+
+                    $paradoxpdf = new ParadoxPDF();
+                    $paradoxpdf->exportPDF( $xhtml, $pdf_file_name,$keys, $subtree_expiry, $expiry, $ignore_content_expiry ) ;
+
                 }break;
 
         }
+        $operatorValue = '';
 
-        $operatorValue = $result;
+
 
     }
 

@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Built-By: Mohamed Karnichi <http://www.tricinty.com>
+Implementation-Vendor: Tricinty.com
+Implementation-Title: ParadoxPDF
+One-Jar-Main-Class: com.tricinty.ParadoxPDF

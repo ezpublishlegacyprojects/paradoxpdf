@@ -6,7 +6,7 @@
  *
  * @category  PHP
  * @package   ParadoxPDF
- * @author    Mohamed Karnichi
+ * @author    Mohamed Karnichi <www.tricinty.com>
  * @copyright 2009 Mohamed Karnichi
  * @license   http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License V2
  * @version   $Id$

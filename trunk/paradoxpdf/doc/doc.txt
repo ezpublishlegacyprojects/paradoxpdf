@@ -33,14 +33,36 @@ Cusotmize pdf View :
 paradoxpdf operator :
 --------------------
   Usage :
-        -Full : paradoxpdf($xhtml, $pdf_file_name, $keys, $subtree_expiry, $expiry , $ignore_content_expiry)
-        -Minium : paradoxpdf($xhtml)
+        -Full : paradoxpdf(hash('xhtml',$xhtml,
+                                'pdf_file_name',$pdf_file_name,
+                                'keys',$keys,
+                                'subtree_expiry',$subtree_expiry,
+                                'expiry',$expiry ,
+                                'ignore_content_expiry',$ignore_content_expiry))
+        -Minium : paradoxpdf(hash('xhtml',$xhtml))
 
   Parameters :
-        $xhtml :required
-        $pdf_file_name : just the name (without .pdf extension) that will be assigned to generated file during download
-                       if not given "file.pdf" will be used
-        $keys, $subtree_expiry, $expiry , $ignore_content_expiry : controls cache (see cache-block documentation)
+        $xhtml : (required)
+        $pdf_file_name : just the name (without .pdf extension) that will be assigned
+                         to generated file during download if not given "file.pdf" will
+                         be used
+        $keys, $subtree_expiry, $expiry , $ignore_content_expiry : controls cache
+                         (see cache-block documentation)
+
+  Example :
+
+  {def  $pdf_file_name  = $module_result.content_info.url_alias|explode('/')|reverse|extract(0)[0]
+        $keys           = array($uri_string,$current_user.contentobject_id)
+        $subtree_expiry = $module_result.node_id
+        $expiry         = 6000
+        $ignore_content_expiry=false()
+
+        $paradoxpdf_params= hash('xhtml', $xhtml,
+                                 'pdf_file_name',$pdf_file_name,
+                                 'keys', $keys,
+                                 'subtree_expiry', $subtree_expiry,
+                                 'expiry',$expiry ,
+                                 'ignore_content_expiry',$ignore_content_expiry)}
 
 PDF cache :
 -----------
@@ -79,86 +101,237 @@ TODO ( Add an extra parameter that sets the base url (SiteUrl) to update all rel
 
 -How do you control page size and margin?
  ----------------------------------------
-    The size property as documented in the CSS3 Paged Media module. Everything in the spec is implemented except auto page handling (the default stylesheet currently sets letter-sized paper with a half-inch margin)
-    (From http://www.w3.org/TR/css3-page/#page-size :)
-            3.3.1. Page size: the 'size' property
-            Name:   size
-            Value:  <length>{1,2} | auto | [ <page-size> || [ portrait | landscape] ]
-            Initial:    auto
-            Applies to:     page context
-            Inherited:  N/A
-            Percentages:    N/A
-            Media:  paged
-            Computed value:     specified value
-
-            This property specifies the size and orientation of the containing box for page content, the page box. In the general case, where one page box is rendered onto one page sheet, the 'size' property also indicates the size of the destination page sheet.
-
-            The size of a page box MAY either be "absolute" (fixed size) or "relative" (scalable, i.e., fitting available sheet sizes). Relative page boxes allow user agents to scale a document and make optimal use of the page size.
-
-            Three values for the 'size' property create a relative page box:
-
-            auto
-                The page box will be set to the size and orientation of the page sheet chosen by the UA.
-            landscape
-                Specifies that the page's content be printed in landscape orientation. The page box is the same size as the page, and the longer sides are horizontal. If a '<length>' or '<page-size>' is not specified, the size of the page sheet is chosen by the UA.
-            portrait
-                Specifies that the page's content be printed in portrait orientation. The page box is the same size as the page, and the shorter sides are horizontal. If a '<length>' or '<page-size>' is not specified, the size of the page sheet is chosen by the UA.
-
-            In the following example, the outer edges of the page box will align with the page. The percentage value on the 'margin' property is relative to the page size so if the page sheet dimensions are 210mm x 297mm (i.e., A4), the margins are 21mm and 29.7mm.
-
-            @page {
-              size: auto;/* auto is the initial value */
-              margin: 10%;
-            }
-
-            Other values define a fixed-size page box, and thereby indicate the preferred output media size. When possible, output should be rendered on the media size indicated; if not available, a larger size should be used; if not available, the contents of the page box should be scaled down to fit the smaller page sheet.
-
-            <length>
-                The page box will be set to the given absolute length. If only one length value is specified, it sets both the width and height of the page box (i.e., the box is a square). The page context has a font associated with it either by an explicit use of the 'font-family' and 'font-size' properties or from the UA's default style sheet. Therefore, values in units of 'em' and 'ex' refer to the page context's font.
-
-            For example:
-
-            @page {
-              size: 8.5in 11in;/* width height */
-            }
-
-            The above example sets the width of the page box to be 8.5 inches and the height to be 11 inches. The page box in this example requires a page sheet size of 8.5"x11" or larger.
-
-            <page-size>
-                A page size can be specified using one of the following media names. This is the equivalent of specifying the '<page-size>' using length values. The definition of the the media names comes from Media Standardized Names [PWGMSN].
-
-                A5
-                    The page box SHOULD be set to the size of ISO A5 media: 148mm wide and 210 mm high.
-                A4
-                    The page box SHOULD be set to the size of IS0 A4 media: 210 mm wide and 297 mm high.
-                A3
-                    The page box SHOULD be set to the size of ISO A3 media: 297mm wide and 420mm high.
-                B5
-                    The page box SHOULD be set to the size of ISO B3 media: 176mm wide by 250mm high.
-                B4
-                    The page box SHOULD be set to the size of ISO B4 media: 250mm wide by 353mm high.
-                letter
-                    The page box SHOULD be set to the size of North American letter media: 8.5 inches wide and 11 inches high
-                legal
-                    The page box SHOULD be set to the size of North American legal: 8.5 inches wide by 14 inches high.
-                ledger
-                    The page box SHOULD be set to the size of North American ledger: 11 inches wide by 17 inches high.
-
-            These media size names can be used in conjunction with 'landscape' or 'portrait' to indicate size and orientation.
-
-            For example:
-
+ The size property as documented in the CSS3 Paged Media module. Everything in the spec is implemented
+ except auto page handling (the default stylesheet currently sets letter-sized paper with a half-inch margin)
+ (See http://www.w3.org/TR/css3-page/#page-size :)
+ Example :
             @page {
               size: A4 landscape;
             }
 
-            The above example sets the width of the page box to be 297mm and the height to be 210mm. The page box in this example should be rendered on a page sheet size of 210 mm by 297 mm.
+            The above example sets the width of the page box to be 297mm and the height to be 210mm.
+            The page box in this example should be rendered on a page sheet size of 210 mm by 297 mm.
+
+
+-How can I embeed custom fonts in the pdf ?
+------------------------------------------
+
+You can force custom font embeeding by using font parameters :
+example
+
+    @font-face {
+        src: url(path/to/somefont.ttf);
+        -fs-pdf-font-embed: embed; /* defaults to auto (i.e. not embedded) */
+
+    }
+
+-Some characters are missing in pdf :
+
+    @font-face {
+        -fs-pdf-font-encoding: Cp1252;
+
+     }
+
+     A possible encoding (from itext documentation):
+     ----------------------------------------------
+        Cp1252        Latin 1
+        Cp1250        Latin 2: Eastern Europe
+        Cp1257        Windows Baltic
+        Cp1251        Cyrillic
+        Cp1253        Greek
+        Cp1254        Turkish
+        MacRoman      MacRoman Encoding
+        Identity-H    The Unicode encoding with horizontal writing.
+        Identity-V    The Unicode encoding with vertical writing.
+
+    IDENTITY_H and IDENTITY_V are not really encodings.
+    They indicate that the unicode character wil be looked up in the font
+    and stored as-is, taking two bytes of space. It's the only way to have
+    Asian fonts and some encodings left out by Adobe such as Thai.
+    For Europe or the Middle-East, it is better to use an available encoding
+    that will store a single byte per character.
+    Fonts with IDENTITY_H or IDENTITY_V will always be embedded
+    no matter what you enter as third parameter.
+
+
+-TOC Table of content And PDF Bookmarks:
+---------------------------------------
+ check the templates :
+   paradoxpdf/design/standard/templates/includes/paradoxpdf_toc.tpl
+   and
+    paradoxpdf/design/standard/templates/includes/paradoxpdf_bookmarks.tpl
+ and make your own toc and pdf bookmarks using ezpublish template programming
+
+
+
+
+
+-Xhtmlrenderer Extra Style parameters :
+---------------------------------------
+
+_______________________________________________________________________________
+                            |
+        Property            |    Description
+____________________________|__________________________________________________
+-fs-keep-with-inline        |    values keep or auto (the default). If it's
+                            |     keep, FS will try to avoid breaking a block
+                            |     in such a way that only padding and borders
+                            |     appear on a page. This works regardless of
+                            |     how deeply nested the inline content is in
+                            |     the block.
+----------------------------+--------------------------------------------------
+-fs-page-sequenc            |    values start or auto (the default) and allows
+                            |     you to limit the scope of the page and pages
+                            |     counters to a portion of the document
+----------------------------+--------------------------------------------------
+-fs-font-metric-src         |    use inside a font-face rule in case the font
+                            |     you want to embed in the PDF has a custom font
+                            |     metrics file; value is the URL to the metrics
+                            |     file for the font
+----------------------------+--------------------------------------------------
+-fs-pdf-font-embed          |    use with the value embed inside a font-face
+                            |     rule to have Flying Saucer embed a font file
+                            |     within a PDF document, avoiding the need to
+                            |     call the addFont() method of the FontResolver
+                            |     class
+----------------------------+--------------------------------------------------
+-fs-pdf-font-encoding       |    use inside a font-face rule to specify the
+                            |     enconding for a custom font you are embedding
+                            |     inside a PDF; takes the name of the encoding
+                            |     as value.
+----------------------------+--------------------------------------------------
+-fs-table-cell-colspan      |    whole number. Replaces use of legacy colspan
+                            |     attribute for table columns.
+----------------------------+--------------------------------------------------
+-fs-table-cell-rowspan      |    whole number. Replaces use of legacy rowspan
+                            |     attribute for table columns.
+----------------------------+--------------------------------------------------
+-fs-table-paginate          |    when used with the value paginate, modifies
+                            |     the table layout algorithm to repeat table
+                            |     headers and footers on subsequent pages and
+                            |     improve the appearance of cells that break
+                            |     across pages (for example by closing and
+                            |     reopening borders), but that's all it does.
+                            |     If a table's minimum width is wider than
+                            |     the page, it will be chopped off.
+----------------------------+--------------------------------------------------
+-fs-text-decoration-extent  |    Either line (default) or block. It
+                            |     controls how text decorations are
+                            |     drawn on a block level element.
+                            |     With line, the spec compliant behavior
+                            |     is used text decoration is drawn across
+                            |     line box. With block, text decoration
+                            |     is drawn across entire content area of block.
+----------------------------+--------------------------------------------------
+
+
+
+Some page selectors From W3C : http://www.w3.org/TR/css3-page/#page-box-page-rule
+---------------------------------------------------------------------------------
+
+_______________________________________________________________________________
+                       |
+    Box                |  Description
+ ______________________|________________________________________________________
+    top-left-corner    |  a fixed-size box filling the area defined by
+                       |  the intersection of the top and left margins
+                       |  of the page box
+-----------------------+-------------------------------------------------------
+    top-left           |  a variable-width box within the area defined
+                       |  by the top margin and adjoining the top-left-corner
+                       |  margin box
+-----------------------+-------------------------------------------------------
+    top-center         |  a variable-width box within the area defined
+                       |  by the top margin, centered on the page area,
+                       |  and between the top-left and top-right margin
+                       |  boxes
+-----------------------+-------------------------------------------------------
+    top-right          |  a variable-width box within the area defined
+                       |  by the top margin and adjoining the top-right-corner
+                       |  margin box
+-----------------------+-------------------------------------------------------
+    top-right-corner   |  a box filling the area defined by the intersection
+                       |  of the top and right margins of the page
+                       |  box
+-----------------------+-------------------------------------------------------
+    left-top           |  a variable-height box within the area defined by
+                       |  the left margin and adjacent to the bottom
+                       |  of the top-left-corner.
+-----------------------+-------------------------------------------------------
+    left-middle        |  a variable-height box in the area defined by
+                       |  the left margin, centered on the page area,
+                       |  and between the left-top and left-bottom
+                       |   margin boxes.
+-----------------------+-------------------------------------------------------
+    left-bottom        |  a variable-height box within the area defined
+                       |  by the left margin and adjacent to the top
+                       |  of the bottom-left-corner.
+-----------------------+-------------------------------------------------------
+    right-top          |  a variable-height box within the area defined
+                       |  by the right margin and adjacent to the bottom
+                       |  of the top-right-corner.
+-----------------------+-------------------------------------------------------
+    right-middle       |  a variable-height box in the area defined by
+                       |  the right margin, centered on the page area,
+                       |  and between the right-top and right-bottom
+                       |  margin boxes.
+-----------------------+-------------------------------------------------------
+    right-bottom       |  a variable-height box within the area defined
+                       |  by the right margin and adjacent to the top
+                       |  of the bottom-right-corner.
+-----------------------+-------------------------------------------------------
+    bottom-left-corner |  a box filling the area defined by the intersection
+                       |  of the bottom and left margins of the page box
+-----------------------+-------------------------------------------------------
+    bottom-left        |  a variable-width box within the area defined
+                       |  by the bottom margin and adjoining the
+                       |  bottom-left-corner margin box
+-----------------------+-------------------------------------------------------
+    bottom-center      |  a variable-width box within the area defined
+                       |  by the bottom margin, centered on the
+                       |  page area, and between the bottom-left
+                       |  and bottom-right margin boxes
+-----------------------+-------------------------------------------------------
+    bottom-right       |  a variable-width box within the area defined
+                       |  by the bottom margin and adjoining the
+                       |  bottom-right corner margin box
+-----------------------+-------------------------------------------------------
+    bottom-right-corner|  a box filling the area defined by the intersection
+                       |  of the bottom and right margins
+                       |  of the page box
+-----------------------+-------------------------------------------------------
+
+Here is a small representation of each zone :
+ _______________________________________
+|     |       |           |       |     |
+| TLC |   TL  |    TC     |  TR   | TRC |
+|_____|_______|___________|_______|_____|
+|     |                           |     |
+|     |                           |     |
+| LT  |                           | RT  |
+|     |                           |     |
+|_____|                           |_____|
+|     |                           |     |
+|     |                           |     |
+| LM  |                           | RM  |
+|     |                           |     |
+|_____|                           |_____|
+|     |                           |     |
+|     |                           |     |
+| LB  |                           | RB  |
+|     |                           |     |
+|_____|___________________________|_____|
+|     |       |           |       |     |
+| BLC |   BL  |    BC     |  BR   | BRC |
+|_____|_______|___________|_______|_____|
+
+
 
 Debug and Issues:
 -----------------
--First make sure that folder paradoxpdf/tmp is writable (chmod 775)
+-First make sure that folder var/paradoxpdf is writable (chmod 775)
 -checkout the latest version of extension
 -enable debug in paradox/settings/paradoxpdf.ini
--cleare the cache (with --purge option)
--regenerate pdf throw content/view/pdf/<node_id>
+-clear the cache (with --purge option)
+-regenerate pdf  content/view/pdf/<node_id>
 -post the output result logged in var/log/paradoxpdf.log on the forum  http://projects.ez.no/paradoxpdf/forum/issues

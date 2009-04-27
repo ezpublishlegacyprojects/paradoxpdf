@@ -6,7 +6,7 @@
  *
  * @category  PHP
  * @package   ParadoxPDF
- * @author    Mohamed Karnichi
+ * @author    Mohamed Karnichi <www.tricinty.com>
  * @copyright 2009 Mohamed Karnichi
  * @license   http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License V2
  * @version   $Id$
@@ -27,23 +27,45 @@
 
 class ParadoxPDF
 {
-    function _construct()
-    {
 
+    private $paradoxPDFExec ;
+    private $paradoxPDFExtensionDir;
+    private $debugEnabled;
+    private $javaExec;
+    private $tmpDir;
+    private $fileSep;
+    private $cacheTTL;
+
+
+    function ParadoxPDF()
+    {
+        $paradoxPDFINI = eZINI::instance('paradoxpdf.ini');
+        $this->debugEnabled = ($paradoxPDFINI->variable('DebugSettings', 'DebugPDF') == 'enabled');
+        $this->javaExec =  $paradoxPDFINI->variable('BinarySettings', 'JavaExecutable');
+        $this->cacheTTL =  $paradoxPDFINI->variable('CacheSettings','TTL');
+        $fileSep = eZSys::fileSeparator();
+        $this->fileSep = $fileSep;
+        $this->paradoxPDFExtensionDir = eZSys::rootDir().$fileSep.eZExtension::baseDirectory().$fileSep.'paradoxpdf';
+        $this->paradoxPDFExec = $this->paradoxPDFExtensionDir.$fileSep.'bin'.$fileSep.'paradoxpdf.jar';
+        $this->tmpDir = eZSys::rootDir().$fileSep.'var'.$fileSep.'paradoxpdf';
     }
+
     /**
      * Performs PDF content generation and caching
      *
-     * @param $xhtml                XHTML content
-     * @param $pdf_file_name        name that will be used when serving the PDF file
-     * @param $keys                 keys for Cache key(s) - either as a string or an array of strings
-     * @param $subtree_expiry       A subtree that expires the pdf file.
-     * @param $expiry               The number of seconds that the cache should be allowed to live.
-     * @param $ignore_content_expiry Disables cache expiry when new content is published.
+     * @param $xhtml                 String    XHTML content
+     * @param $pdf_file_name         String    Name that will be used when serving the PDF file (not for storage)
+     * @param $keys                  Mixed     Keys for Cache key(s) - either as a string or an array of strings
+     * @param $subtree_expiry        Mixed     The parameter $subtreeExpiryParameter is expiry value is usually taken from the template operator and can be one of:
+     *                                           - A numerical value which represents the node ID (the fastest approach)
+     *                                           - A string containing 'content/view/full/xxx' where xx is the node ID number, the number will be extracted.
+     *                                           - A string containing a nice url which will be decoded into a node ID using the database (slowest approach).
+     * @param $expiry                Integer   The number of seconds that the pdf cache should be allowed to live.A value of zero will produce a cache block that will never expire
+     * @param $ignore_content_expiry Boolean   Disables cache expiry when new content is published.
      * @return void
      */
 
-    static function exportPDF($xhtml, $pdf_file_name = 'file', $keys = array(), $subtree_expiry, $expiry, $ignore_content_expiry)
+    public function exportPDF($xhtml = '', $pdf_file_name = '', $keys, $subtree_expiry, $expiry, $ignore_content_expiry = false)
     {
         if($pdf_file_name == '')
         {
@@ -54,18 +76,13 @@ class ParadoxPDF
 
         $keys = self::getCacheKeysArray($keys);
 
-        $ini = eZINI::instance();
-        $paradoxPDFINI = eZINI::instance('paradoxpdf.ini');
-
-        //TODO : check if viewcache is enabled else serve the generated pdf on the fly
-
-        $expiry = ($expiry) ? $expiry : $paradoxPDFINI->variable('CacheSettings','TTL');
+        $expiry = (is_numeric($expiry) ) ? $expiry : $this->cacheTTL;
 
         list($handler, $data) = eZTemplateCacheBlock::retrieve($keys, $subtree_expiry, $expiry, $use_global_expiry);
 
         if ($data instanceof eZClusterFileFailure)
         {
-            $data = self::generatePDF($xhtml);
+            $data = $this->generatePDF($xhtml);
 
             // check if error occurred during pdf generation
             if($data === false)
@@ -79,7 +96,7 @@ class ParadoxPDF
         $size  = $handler->size();
         $mtime = $handler->mtime();
 
-        self::flushPDF($data, $pdf_file_name, $size, $mtime, $expiry);
+        $this->flushPDF($data, $pdf_file_name, $size, $mtime, $expiry);
         return;
     }
 
@@ -89,46 +106,51 @@ class ParadoxPDF
      * @param $xhtml
      * @return Binary pdf content of false if error
      */
-    static function generatePDF($xhtml)
+    public function generatePDF($xhtml)
     {
-        $ini = eZINI::instance();
-        $paradoxPDFINI = eZINI::instance('paradoxpdf.ini');
-        $sep = eZSys::fileSeparator();
-        $paradoxPDFExtensionDir = eZSys::rootDir().$sep.eZExtension::baseDirectory().$sep.'paradoxpdf';
-        $debugEnabled = ($paradoxPDFINI->variable('DebugSettings', 'DebugPDF') == 'enabled');
-
-        $javaExec = $paradoxPDFINI->variable('BinarySettings', 'JavaExecutable');
-        $paradoxPDFExec =$paradoxPDFExtensionDir.$sep.'bin'.$sep.'paradoxpdf.jar';
-
-        // temporary files for conversion
-        $tmpDir = $paradoxPDFExtensionDir.$sep.'tmp';
-        $rand = md5('paradoxpdf'. getmypid() . mt_rand());
-        $tmpXHTMLFile = $tmpDir.$sep.$rand.'.xhtml';
-        $tmpPDFFile = $tmpDir.$sep.$rand.'.pdf';
-
-        //check if $tmpdir is writable
-        if(!eZFileHandler::doIsWriteable($tmpDir))
+        //check if $tmpdir exists else try to create it
+        if(!eZFileHandler::doExists($this->tmpDir))
         {
-            eZDebug::writeWarning("ParadoxPDF::generatePDF Error : please make $tmpDir writable ", 'ParadoxPDF::generatePDF');
-            eZLog::write("ParadoxPDF::generatePDF Error : please make $tmpDir writable ",'paradoxpdf.log');
-
+            if(!eZDir::mkdir( $this->tmpDir, eZDir::directoryPermission(), true ))
+            {
+                eZDebug::writeWarning("ParadoxPDF::generatePDF Error : could not create temporary directory $this->tmpDir ", 'ParadoxPDF::generatePDF');
+                eZLog::write("ParadoxPDF::generatePDF Error : could not create temporary directory $this->tmpDir ",'paradoxpdf.log');
+                return false;
+            }
+        }
+        elseif(!eZFileHandler::doIsWriteable($this->tmpDir))
+        {
+            //check if $tmpdir is writable
+            eZDebug::writeWarning("ParadoxPDF::generatePDF Error : please make $this->tmpDir writable ", 'ParadoxPDF::generatePDF');
+            eZLog::write("ParadoxPDF::generatePDF Error : please make $this->tmpDir writable ",'paradoxpdf.log');
             return false;
         }
 
+        $rand = md5('paradoxpdf'. getmypid() . mt_rand());
+        $tmpXHTMLFile = $this->tmpDir.$this->fileSep.$rand.'.xhtml';
+        $tmpPDFFile = $this->tmpDir.$this->fileSep.$rand.'.pdf';
+
         //fix relative urls to match ez root directory
-        $xhtml = self::fixURL($xhtml);
+        $xhtml = $this->fixURL($xhtml);
 
         eZFile::create($tmpXHTMLFile, false, $xhtml) ;
 
         $pdfConent = '';
 
         //run jar in headless mode
-        $command = "$javaExec -Djava.awt.headless=true -jar $paradoxPDFExec $tmpXHTMLFile $tmpPDFFile";
+        $command = $this->javaExec." -Djava.awt.headless=true";
+
+        if($this->debugEnabled)
+        {
+            $command .= " -Dxr.util-logging.loggingEnabled=true";
+        }
+
+        $command .= " -jar ".$this->paradoxPDFExec." $tmpXHTMLFile $tmpPDFFile";
 
         if(eZSys::osType() != 'win32')
         {
             //fix to get command output result on *nix systems
-            $command .= '  2>&1';
+            $command .= "  2>&1";
         }
 
         //Enter the Matrix
@@ -137,11 +159,11 @@ class ParadoxPDF
         //Cant trust java return code so we test if a plain pdf file is genereated
         if (!(eZFileHandler::doExists($tmpPDFFile) && filesize($tmpPDFFile)))
         {
-            self::writeCommandLog($command, $output, false);
+            $this->writeCommandLog($command, $output, false);
             return false;
         }
 
-        self::writeCommandLog($command, $output, true);
+        $this->writeCommandLog($command, $output, true);
 
         $pdfContent = file_get_contents($tmpPDFFile); //thanks to Damien Pobel
 
@@ -168,7 +190,7 @@ class ParadoxPDF
      * @param $expiry
      * @return void
      */
-    static function flushPDF($data, $pdf_file_name='file', $size, $mtime, $expiry)
+    private function flushPDF($data, $pdf_file_name='file', $size, $mtime, $expiry)
     {
         ob_clean();
 
@@ -200,9 +222,8 @@ class ParadoxPDF
      * @return array
      */
 
-    static function getCacheKeysArray( $userKeys )
+    public function getCacheKeysArray( $userKeys )
     {
-
         if(!is_array($userKeys))
         {
             $userKeys = array($userKeys);
@@ -221,14 +242,14 @@ class ParadoxPDF
         $userParameters = $uri->userParameters();
 
         $cacheKeysArray = array('paradoxpdf',
-        $currentSiteAccess,
-        $layout,
-        $actualRequestedURI,
-        implode( '.', $userParameters ),
-        implode( '.', $roleList ),
-        implode( '.', $limitedAssignmentValueList),
-        implode( '.', $discountList ),
-        implode( '.', $userKeys ));
+                                $currentSiteAccess,
+                                $layout,
+                                $actualRequestedURI,
+                                implode( '.', $userParameters ),
+                                implode( '.', $roleList ),
+                                implode( '.', $limitedAssignmentValueList),
+                                implode( '.', $discountList ),
+                                implode( '.', $userKeys ));
 
         return $cacheKeysArray;
 
@@ -242,11 +263,9 @@ class ParadoxPDF
      * @return Void
      */
 
-    static function writeCommandLog($command, $output, $status=false)
+    private function writeCommandLog($command, $output, $status=false)
     {
 
-        $paradoxPDFINI = eZINI::instance('paradoxpdf.ini');
-        $debugEnabled = ($paradoxPDFINI->variable('DebugSettings', 'DebugPDF') == 'enabled');
         $logMessage = implode("\n", $output);
 
         if(!$status)
@@ -270,9 +289,9 @@ class ParadoxPDF
      * @return String html with fixed urls
      */
 
-    static function fixURL($html)
+    private function fixURL($html)
     {
-        $htmlfixed = preg_replace('#(href|src)\s*=\s*["\'](?!https?|mailto)(.*)["\']#i', '$1="../../..$2"', $html);
+        $htmlfixed = preg_replace('#(href|src)\s*=\s*["\'](?!https?|mailto)(\/?)(.*\..{2,4})["\']#i', '$1="../../$3"', $html);
         return $htmlfixed;
     }
 

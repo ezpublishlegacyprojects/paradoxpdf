@@ -1,35 +1,51 @@
 /****************************************************************************************
- * Core pdf export CSS FIle
+ * Core paradoxpdf export CSS File
+ * Author : Mohamed Karnichi <www.tricinty.com>
  ****************************************************************************************/
 
 /* Control page rendring: please refer to doc/doc.txt */
 @page {
-	size: a4 portrait;
-	margin: 0.25in;
-	-fs-flow-top: "header";
-	-fs-flow-bottom: "footer";
-	-fs-flow-left: "left";
-	-fs-flow-right: "right";
-	border: thin solid black;
-	padding: 1em;
+    size: a4 portrait;
+    margin: 0.25in;
+    padding: 1em;
+    @top-left {
+       content: element(header);
+    }
+     @bottom-right {
+        content: element(footer);
+      }
 }
 
 /*header as footer will automatically icluded in each pdf printed page*/
 #header {
-position: absolute; top: 0; right: 0;
--fs-move-to-flow: "header";
-}
+       display: block;
+       padding : 3px;
+       position: running(header);
+       background : purple;
+       color : #FFFFFF;
+   }
+ #footer {
+      display: block;
+      border-top: 1px solid black;
+      position: running(footer);
 
-#footer {
-font-size: 90%; font-style: italic;
-position: absolute; top: 0; right: 0;
--fs-move-to-flow: "footer";
-}
+    }
 
 #pagenumber:before {
-content: counter(page);
+    content: counter(page);
 }
 
 #pagecount:before {
-content: counter(pages);
+    content: counter(pages);
 }
+
+/* Used for generating Table of content */
+#toc a::after { content: leader('.') target-counter(attr(href), page); }
+h2, h3, h4 { page-break-before: always; }
+
+/* Use this class for forcing page break inside pdf */
+.page_breaker{
+        page-break-after:always;
+}
+
+
