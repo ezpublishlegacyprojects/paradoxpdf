@@ -26,8 +26,13 @@ Make link to pdf view :
 Cusotmize pdf View :
 --------------------
 
+   -When you make your design : comment paradoxpdf operator call, and the set-block function call:
+                                {*set-block variable=$xhtml*}...{*/set-block*}, and check your desing in your prefered
+                                browser (firefox recommanded). Then when everything looks fine uncomment
+                                the paradoxpdf operator call.
    -You can customize the pdf view just as any html view : just override the node/view/pdf.tpl
    -Fore more information look in : design/templates/pdf_export_layout.tpl
+
 
 
 paradoxpdf operator :
@@ -116,21 +121,35 @@ TODO ( Add an extra parameter that sets the base url (SiteUrl) to update all rel
 -How can I embeed custom fonts in the pdf ?
 ------------------------------------------
 
-You can force custom font embeeding by using font parameters :
-example
+You can force custom font embeeding by using font parameters  :
+example :
+
 
     @font-face {
-        src: url(path/to/somefont.ttf);
+        font-family : "font family name";/*put here font family name example Arial*/
+        src: url(path/to/somefont.ttf); /*put here relative path to your font*/
         -fs-pdf-font-embed: embed; /* defaults to auto (i.e. not embedded) */
 
     }
 
--Some characters are missing in pdf :
+    example for div:
+
+    div.my_custom_font{
+        font-family : "font family name";/*put here font family name example: Arial*/
+    }
+
+You can add as many custom font as you want, for each font add a @font-face rule
+
+
+-If Some characters are missing in pdf  try to change font-encoding:
 
     @font-face {
-        -fs-pdf-font-encoding: Cp1252;
+        font-family : "font family name";/*put here font family name example Arial*/
+        src: url(path/to/somefont.ttf); /*put here relative path to your font*/
+        -fs-pdf-font-embed: embed; /* defaults to auto (i.e. not embedded) */
+        -fs-pdf-font-encoding:  Identity-H; /* use an encoding : the folowing encodings  */
+    }
 
-     }
 
      A possible encoding (from itext documentation):
      ----------------------------------------------

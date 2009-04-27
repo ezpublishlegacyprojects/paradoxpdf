@@ -56,11 +56,15 @@ class ParadoxPDF
      * @param $xhtml                 String    XHTML content
      * @param $pdf_file_name         String    Name that will be used when serving the PDF file (not for storage)
      * @param $keys                  Mixed     Keys for Cache key(s) - either as a string or an array of strings
-     * @param $subtree_expiry        Mixed     The parameter $subtreeExpiryParameter is expiry value is usually taken from the template operator and can be one of:
+     * @param $subtree_expiry        Mixed     The parameter $subtreeExpiryParameter is expiry value is usually taken
+     *                                         from the template operator and can be one of:
      *                                           - A numerical value which represents the node ID (the fastest approach)
-     *                                           - A string containing 'content/view/full/xxx' where xx is the node ID number, the number will be extracted.
-     *                                           - A string containing a nice url which will be decoded into a node ID using the database (slowest approach).
-     * @param $expiry                Integer   The number of seconds that the pdf cache should be allowed to live.A value of zero will produce a cache block that will never expire
+     *                                           - A string containing 'content/view/full/xxx' where xx is the node ID number,
+     *                                             the number will be extracted.
+     *                                           - A string containing a nice url which will be decoded into a node ID using
+     *                                             the database (slowest approach).
+     * @param $expiry                Integer   The number of seconds that the pdf cache should be allowed to live.A value of
+     *                                         zero will produce a cache block that will never expire
      * @param $ignore_content_expiry Boolean   Disables cache expiry when new content is published.
      * @return void
      */
