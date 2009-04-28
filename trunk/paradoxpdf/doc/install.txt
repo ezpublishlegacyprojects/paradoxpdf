@@ -14,7 +14,11 @@ Installation :
 -Copy paradoxpdf in extension directory
 -In  settings/paradoxpdf.ini set your java executable path :
     [BinarySettings]
+    # *nix example
     JavaExecutable=/usr/bin/java
+    # windows example
+    JavaExecutable="C:\Program Files\Java\jre6\bin\java.exe"
+
 
 -Enable the extension in site.ini
 -Clear the cache

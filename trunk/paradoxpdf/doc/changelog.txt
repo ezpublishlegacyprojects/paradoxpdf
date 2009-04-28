@@ -3,16 +3,19 @@ V 2.0 :
  ParadoxPDF changes :
  --------------------
       * Rebuild using xhtmlrendrer R8 Final
-      * Added TOC Table of content and PDF Bookmark support
-      * Custom fonts embeeding and custom characters rendering documentation
+      * Added TOC Table of content and PDF Bookmarks support
+      * Custom fonts embeeding
+      * Custom characters (Asian, Arabic, Greek ...) rendering documentation
       * Template upgrade
-           o update of core css
+           o update of print-core css
            /!\ WARNIG : Unfortunately, it wasn't possible to maintain backwards compatibility with the old
                         -fs-move-to-flow approach and those properties have beenremoved in the xhtmlrendrer R8.
                          The conversion to the new way of doing things should bestraightforward though.
-                         check paradoxpdf documentation and new core css
+                         check paradoxpdf documentation and new print-core.css
+           o update paradoxpdf template operator call : check the documentation for more info
 
-      * paradoxpdf/tmp folder moved to var/paradoxpdf/ (Merci Damien Pobel)
+      * paradoxpdf/tmp folder moved to var/paradoxpdf/ and  eZFile::getContents() removed (Merci Damien Pobel)
+      * Added example setting for java executable path on windows (Merci Jean-Yves Zinsou)
 
 
 ParadoxPDF includes new features of the new xhtmlrendrer R8: https://xhtmlrenderer.dev.java.net/
@@ -27,17 +30,13 @@ Highlights of the changes (from xhtmlrendrer release news):
           o Add API to retrieve PDF page and coordinates for boxes with an ID attribute
           o Implement CMYK color support for PDF output
           o Support encryption of PDF output
-    * Swing
-          o Basic support for selection, highlighting and copying
     * General
           o Expose copy of parsed entities from catalog.
           o Preliminary support for data URLs
           o Support True Type Collection (.ttc) files
           o Preliminary support for Type 1 fonts
-          o Support logging via Log4J as an alternative to JDK logging (requires recompile)
           o Handle hidden form elements
           o Rudimentary support for JavaScript links (from Dan Kaplan)
-          o Support for callback on form submission
     * CSS
           o Prelimary support for @font-face rules
           o Implement partial support for leader and target-counter (patch from Karl Tauber)

@@ -151,11 +151,8 @@ class ParadoxPDF
 
         $command .= " -jar ".$this->paradoxPDFExec." $tmpXHTMLFile $tmpPDFFile";
 
-        if(eZSys::osType() != 'win32')
-        {
-            //fix to get command output result on *nix systems
-            $command .= "  2>&1";
-        }
+        //fix to get all command output
+        $command .= "  2>&1";
 
         //Enter the Matrix
         exec($command, $output, $returnCode);
@@ -194,7 +191,7 @@ class ParadoxPDF
      * @param $expiry
      * @return void
      */
-    private function flushPDF($data, $pdf_file_name='file', $size, $mtime, $expiry)
+    public function flushPDF($data, $pdf_file_name='file', $size, $mtime, $expiry)
     {
         ob_clean();
 
