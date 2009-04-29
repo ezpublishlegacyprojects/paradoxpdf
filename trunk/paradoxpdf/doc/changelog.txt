@@ -1,3 +1,9 @@
+V 2.0.1 :
+-------
+    * Added example path of java executable for windows
+    * Windows debug output fixed
+
+
 V 2.0 :
 ------
  ParadoxPDF changes :
