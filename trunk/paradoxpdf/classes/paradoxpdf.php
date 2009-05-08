@@ -35,11 +35,14 @@ class ParadoxPDF
     private $tmpDir;
     private $fileSep;
     private $cacheTTL;
+    private $cacheEnabled;
+    private $size;
 
 
     function ParadoxPDF()
     {
         $paradoxPDFINI = eZINI::instance('paradoxpdf.ini');
+        $this->cacheEnabled = ($paradoxPDFINI->variable('CacheSettings', 'PDFCache') == 'enabled');
         $this->debugEnabled = ($paradoxPDFINI->variable('DebugSettings', 'DebugPDF') == 'enabled');
         $this->javaExec =  $paradoxPDFINI->variable('BinarySettings', 'JavaExecutable');
         $this->cacheTTL =  $paradoxPDFINI->variable('CacheSettings','TTL');
@@ -76,15 +79,43 @@ class ParadoxPDF
             $pdf_file_name = 'file';
         }
 
-        $use_global_expiry = !$ignore_content_expiry;
+        $data = '';
+        $size = 0;
+        $mtime = eZDateTime::currentTimeStamp();
+        $httpExpiry = $this->cacheTTL;
 
-        $keys = self::getCacheKeysArray($keys);
+        if($this->cacheEnabled)
+        {
+            $use_global_expiry = !$ignore_content_expiry;
 
-        $expiry = (is_numeric($expiry) ) ? $expiry : $this->cacheTTL;
+            $keys = self::getCacheKeysArray($keys);
 
-        list($handler, $data) = eZTemplateCacheBlock::retrieve($keys, $subtree_expiry, $expiry, $use_global_expiry);
+            $expiry = (is_numeric($expiry) ) ? $expiry : $this->cacheTTL;
 
-        if ($data instanceof eZClusterFileFailure)
+            if($expiry > 0)
+            {
+                $httpExpiry = $expiry;
+            }
+
+            list($handler, $data) = eZTemplateCacheBlock::retrieve($keys, $subtree_expiry, $expiry, $use_global_expiry);
+
+            if ($data instanceof eZClusterFileFailure)
+            {
+                $data = $this->generatePDF($xhtml);
+
+                // check if error occurred during pdf generation
+                if($data === false)
+                {
+                    return;
+                }
+                $handler->storeCache(array(  'scope'      => 'template-block',
+                                             'binarydata' => $data));
+            }
+
+            $size  = $handler->size();
+            $mtime = $handler->mtime();
+        }
+        else
         {
             $data = $this->generatePDF($xhtml);
 
@@ -93,22 +124,17 @@ class ParadoxPDF
             {
                 return;
             }
-            $handler->storeCache(array(  'scope'      => 'template-block',
-                                         'binarydata' => $data));
+            $size = $this->size;
         }
 
-        $size  = $handler->size();
-        $mtime = $handler->mtime();
-
-        $this->flushPDF($data, $pdf_file_name, $size, $mtime, $expiry);
-        return;
+        $this->flushPDF($data, $pdf_file_name, $size, $mtime, $httpExpiry);
     }
 
     /**
      * Converts xhtml to pdf
      *
      * @param $xhtml
-     * @return Binary pdf content of false if error
+     * @return Binary pdf content or false if error
      */
     public function generatePDF($xhtml)
     {
@@ -158,7 +184,7 @@ class ParadoxPDF
         exec($command, $output, $returnCode);
 
         //Cant trust java return code so we test if a plain pdf file is genereated
-        if (!(eZFileHandler::doExists($tmpPDFFile) && filesize($tmpPDFFile)))
+        if (!(eZFileHandler::doExists($tmpPDFFile) && $this->size=filesize($tmpPDFFile)))
         {
             $this->writeCommandLog($command, $output, false);
             return false;
@@ -166,7 +192,7 @@ class ParadoxPDF
 
         $this->writeCommandLog($command, $output, true);
 
-        $pdfContent = file_get_contents($tmpPDFFile); //thanks to Damien Pobel
+        $pdfContent = file_get_contents($tmpPDFFile);
 
         //cleanup temporary files
         //if debug enabled preseves the temporary pdf file
@@ -196,9 +222,20 @@ class ParadoxPDF
         ob_clean();
 
         header('X-Powered-By: eZ Publish - ParadoxPDF');
-        header('Expires: ' . gmdate('D, d M Y H:i:s', $mtime + $expiry) . ' GMT');
-        header('Cache-Control: max-age=' . $expiry);
-        header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $mtime) . ' GMT');
+        if($this->cacheEnabled)
+        {
+            header('Expires: ' . gmdate('D, d M Y H:i:s', $mtime + $expiry) . ' GMT');
+            header('Cache-Control: max-age=' . $expiry);
+            header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $mtime) . ' GMT');
+        }
+        else
+        {
+            header('Expires: Sat, 01 Jan 2000 00:00:00 GMT');
+            header('Cache-Control: no-store, no-cache, must-revalidate');
+            header('Cache-Control: post-check=0, pre-check=0', FALSE);
+            header('Pragma: no-cache');
+        }
+
         header('Content-Type: application/pdf');
         header('Content-Length: ' . $size);
         //TODO : sanitize pdf_file_name to prevent file donwload injection attacks
@@ -212,7 +249,6 @@ class ParadoxPDF
         print($data);
 
         eZExecution::cleanExit();
-        return;
     }
 
 
@@ -274,7 +310,7 @@ class ParadoxPDF
             eZDebug::writeError("An error occured during pdf generation please check var/log/paradoxpdf.log", 'ParadoxPDF::generatePDF');
             eZLog::write("Failed executing command : $command , \n Output : $logMessage",'paradoxpdf.log');
         }
-        elseif($debugEnabled)
+        elseif($this->debugEnabled)
         {
             eZLog::write("ParadoxPDF : PDF conversion successful: $command , \n Output : $logMessage",'paradoxpdf.log');
         }
@@ -294,6 +330,32 @@ class ParadoxPDF
     {
         $htmlfixed = preg_replace('#(href|src)\s*=\s*["\'](?!https?|mailto)(\/?)(.*\..{2,4})["\']#i', '$1="../../$3"', $html);
         return $htmlfixed;
+    }
+
+    /**
+     *  Check if user has access to the content/pdf view for the
+     *  given node_id.
+     *  When UseContentPdfPolicy disabled it will always returns true
+     *
+     * @param  $node_id Integer
+     * @return Boolean  Access status
+     */
+
+    static function canPDFNode( $node_id)
+    {
+        $status = true;
+        if(eZINI::instance('paradoxpdf.ini')->variable('AccessSettings', 'UseContentPdfPolicy') == 'enabled')
+        {
+            $currentNode = eZContentObjectTreeNode::fetch($node_id);
+            $status = $currentNode->canPdf();
+        }
+
+        if(!$status)
+        {
+            eZDebug::writeError('ParadoxPDF PDF Access denied', 'ParadoxPDF::canPDFNode');
+            eZLog::write('ParadoxPDF PDF Access denied','paradoxpdf.log');
+        }
+        return $status;
     }
 
 }

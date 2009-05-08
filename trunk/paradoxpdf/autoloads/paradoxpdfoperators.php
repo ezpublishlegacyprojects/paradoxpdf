@@ -55,6 +55,15 @@ class ParadoxPDFOperators
     {
         $params = $namedParameters['paradoxpdf_params'];
 
+        // If content node, check specific access policies
+        $moduleResult = $tpl->variable('module_result');
+
+        if( isset($moduleResult['node_id']) && !ParadoxPDF::canPDFNode($moduleResult['node_id']))
+        {
+            $operatorValue = ezi18n( 'design/standard/error/kernel', 'Access denied' );
+            return;
+        }
+
 
         switch ( $operatorName )
         {

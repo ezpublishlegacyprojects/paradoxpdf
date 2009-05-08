@@ -41,11 +41,10 @@
 
 /* Used for generating Table of content */
 #toc a::after { content: leader('.') target-counter(attr(href), page); }
-h2, h3, h4 { page-break-before: always; }
+/* Use this class for first level titles */
+.page_break_before{ page-break-before: always; }
 
 /* Use this class for forcing page break inside pdf */
-.page_breaker{
-        page-break-after:always;
-}
+.page_breaker{page-break-after:always;}
 
 

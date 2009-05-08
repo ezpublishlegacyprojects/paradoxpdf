@@ -12,7 +12,7 @@ Make link to pdf view :
                   example : content/view/pdf/2
     - if you are concerned by SEO you cans use  layout/set/pdf/<url_alias>
                   example : layout/set/pdf/Home
-            (be carefull with this aproach the node/view/full templates will be used instead of node/view/pdf)
+            (be careful with this approach the node/view/full templates will be used instead of node/view/pdf)
 
 -For module views:
 
@@ -27,10 +27,12 @@ Cusotmize pdf View :
 --------------------
 
    -When you make your design : comment paradoxpdf operator call, and the set-block function call:
-                                {*set-block variable=$xhtml*}...{*/set-block*}, and check your desing in your prefered
-                                browser (firefox recommanded). Then when everything looks fine uncomment
+                                {*set-block variable=$xhtml*}...{*/set-block*}, and check your design in your prefered
+                                browser (firefox recommended). Then when everything looks fine uncomment
                                 the paradoxpdf operator call.
    -You can customize the pdf view just as any html view : just override the node/view/pdf.tpl
+   -To avoid clearing the pdf cache each time you modify the template to check the pdf, just disable the PDFCache in
+    the paradoxpdf.ini But make sure the enable it in production environment.
    -Fore more information look in : design/templates/pdf_export_layout.tpl
 
 
@@ -88,13 +90,27 @@ By default a key is generated using following parameters :
 If a keys parameter is provided through the template operator paradoxpdf it will be appended to this default keys
 for example if you want to cache the pdf content per user :
 
-{def $pdf_file_name  = $module_result.content_info.url_alias|explode('/')|reverse|extract(0)[0]
-     $keys           = array($current_user.contentobject_id)
+{def $paradoxpdf_params = hash('xhtml', $xhtml,
+                               'pdf_file_name',$module_result.content_info.url_alias|explode('/')|reverse|extract(0)[0],
+                               'keys', $current_user.contentobject_id)
+
 }
-{paradoxpdf($xhtml,$pdf_file_name, $keys)}
+
+if you want that pdf cache expires when a content node updated :
+
+{def $paradoxpdf_params = hash('xhtml', $xhtml,
+                               'pdf_file_name',$module_result.content_info.url_alias|explode('/')|reverse|extract(0)[0],
+                               'subtree_expiry',$module_result.node_id )
+
+}
+then your pass this parameters to paradoxpdf operator
+
+{paradoxpdf($paradoxpdf_params)}
+
+Note : You can combine all parameters
 
 
--image handling and the Cluster mode
+-Image handling and the Cluster mode
  ------------------------------------
 
 By default paradoxpdf handles relative images and css uri.
@@ -102,7 +118,34 @@ But Just notice that the simplest way to have links and images working in your p
 The XHTML rendrer will try to load them through HTTP. By this way paradoxpdf can handle ressources stored in Cluster mode.
 If you choose this way, please make sure that your server firewall configuration enables connections through the port 80
 
+Note : you have to use "&amp;" instead of "&" to indicate an ampersand in the url of external images or css, the rendrer
+       will then be able to load properly the image.
+
 TODO ( Add an extra parameter that sets the base url (SiteUrl) to update all relative urls to absolute by appending this base)
+
+
+
+-Javascript support :
+ --------------------
+
+ The Xhtmlrendrer don't have javascript support. However If you want to print google maps in your pdfs you can use the google
+ maps static api http://code.google.com/apis/maps/documentation/staticmaps/ witch enables using google maps without javascripts.
+
+
+-Access policies:
+-----------------
+
+As paradoxpdf is a template operator, pdf generation will be available to all users having content read access.
+However, in plus of this default behayiour, when you enable UseContentPDFPolicy setting
+
+[AccessSettings]
+UseContentPDFPolicy=enabled
+
+In plus of content/read policies ParadoxPDF will check access policies for native pdf function of the content module.
+In the Administration Interface, click the User accounts tab, then the Roles and Policies link.
+Grant access to appropriate users to the pdf function of the content module.
+
+
 
 -How do you control page size and margin?
  ----------------------------------------
@@ -117,11 +160,10 @@ TODO ( Add an extra parameter that sets the base url (SiteUrl) to update all rel
             The above example sets the width of the page box to be 297mm and the height to be 210mm.
             The page box in this example should be rendered on a page sheet size of 210 mm by 297 mm.
 
-
--How can I embeed custom fonts in the pdf ?
+-How can I embed custom fonts in the pdf ?
 ------------------------------------------
 
-You can force custom font embeeding by using font parameters  :
+You can force custom font embeding by using font parameters  :
 example :
 
 
@@ -348,9 +390,9 @@ Here is a small representation of each zone :
 
 Debug and Issues:
 -----------------
--First make sure that folder var/paradoxpdf is writable (chmod 775)
--checkout the latest version of extension
--enable debug in paradox/settings/paradoxpdf.ini
--clear the cache (with --purge option)
--regenerate pdf  content/view/pdf/<node_id>
--post the output result logged in var/log/paradoxpdf.log on the forum  http://projects.ez.no/paradoxpdf/forum/issues
+-Checkout the latest version of extension
+-Make sure that folder var/paradoxpdf is writeable (chmod 775)
+-Enable debug in paradox/settings/paradoxpdf.ini
+-Clear the cache (with --purge option)
+-Regenerate pdf  content/view/pdf/<node_id>
+-Post the output result logged in var/log/paradoxpdf.log on the forum  http://projects.ez.no/paradoxpdf/forum/issues

@@ -20,7 +20,7 @@
 </ol>
 
 {*here is a sample content (for example purpose only remove it in your own toc)*}
-<h2><a name="link_1">Chapter Title 1</a></h2>
+<h2 class='page_break_before'><a name="link_1">Chapter Title 1</a></h2>
     <h3><a name="link_1_1">Chapter Title 1.1</a></h3>
         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
          Nullam dapibus. Donec est quam, posuere eget, mollis nec, tristique eu, nisl.
@@ -80,7 +80,7 @@
          dignissim ac, luctus et, suscipit sed, urna. Praesent tincidunt consequat tellus.
          Proin fringilla orci non nunc. Proin eros lectus, bibendum nec, tincidunt eu, bibendum non, ipsum. </p>
 
-<h2 id="link_2"><a name="link_2">Chapter Title 2</a></h2>
+<h2 class='page_break_before'><a name="link_2">Chapter Title 2</a></h2>
      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
          Nullam dapibus. Donec est quam, posuere eget, mollis nec, tristique eu, nisl.
          Pellentesque sem diam, viverra ac, vehicula in, pulvinar vel, metus.
@@ -92,7 +92,7 @@
          dignissim ac, luctus et, suscipit sed, urna. Praesent tincidunt consequat tellus.
          Proin fringilla orci non nunc. Proin eros lectus, bibendum nec, tincidunt eu, bibendum non, ipsum. </p>
 
-<h2 id="link_3"><a name="link_3">Chapter Title 3</a></h2>
+<h2 class='page_break_before'><a name="link_3">Chapter Title 3</a></h2>
      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
          Nullam dapibus. Donec est quam, posuere eget, mollis nec, tristique eu, nisl.
          Pellentesque sem diam, viverra ac, vehicula in, pulvinar vel, metus.
