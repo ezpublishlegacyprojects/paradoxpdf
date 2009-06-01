@@ -12,6 +12,7 @@ installation instructions for JRE as described on the Java home pages.
 Installation :
 
 -Copy paradoxpdf in extension directory
+-Regenerate autoloads : php bin/php/ezpgenerateautoloads.php -e
 -In  settings/paradoxpdf.ini set your java executable path :
     [BinarySettings]
     # *nix example
