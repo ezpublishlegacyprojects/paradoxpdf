@@ -4,4 +4,5 @@
                          language_code=$language_code
                          view_parameters=$view_parameters
                          collection_attributes=$collection_attributes
-                         validation=$validation}
+                         validation=$validation
+                         persistent_variable=$persistent_variable}
