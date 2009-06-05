@@ -1,5 +1,23 @@
+V 2.1.2 :
+--------
+    * Fixed http headers 
+        - For ssl mode 
+        - Better file download handeling
+        - Proxy cache (pdf are only cached on browser to avoid serving same pdfs for all users)
+    * Documentation update 
+
+V 2.1.1 :
+--------
+
+    * Updated node/view/pdf.tpl so ($viewmode $language_code $view_parameters 
+      $collection_attributes $validation, $persistent_variable) still available
+      in default node/view/full.tpl
+    * Updated Roadmap
+    * Updated installation instructions (added autoload regeneration)
+
+
 V 2.1.0 :
--------
+--------
     * Added Check Access policies option
     * Core CSS update for generic TOC
     * Added PDFCache ini setting for developpers (developper mode)

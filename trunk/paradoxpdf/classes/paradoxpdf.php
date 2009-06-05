@@ -219,30 +219,50 @@ class ParadoxPDF
      */
     public function flushPDF($data, $pdf_file_name='file', $size, $mtime, $expiry)
     {
+
+        //Fixing https issues and forcing file download
+        $contentType = 'application/octet-stream';
+        $userAgent = eZSys::serverVariable( 'HTTP_USER_AGENT' );
+
+        if(preg_match('%Opera(/| )([0-9].[0-9]{1,2})%', $userAgent))
+        {
+            $contentType = 'application/octetstream';
+        }
+        elseif(preg_match('/MSIE ([0-9].[0-9]{1,2})/', $userAgent))
+        {
+            $contentType = 'application/force-download';
+
+        }
+
         ob_clean();
 
         header('X-Powered-By: eZ Publish - ParadoxPDF');
+        header('Content-Type: '.$contentType);
         if($this->cacheEnabled)
         {
             header('Expires: ' . gmdate('D, d M Y H:i:s', $mtime + $expiry) . ' GMT');
             header('Cache-Control: max-age=' . $expiry);
             header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $mtime) . ' GMT');
+            header('Pragma: cache');
         }
         else
         {
             header('Expires: Sat, 01 Jan 2000 00:00:00 GMT');
-            header('Cache-Control: no-store, no-cache, must-revalidate');
-            header('Cache-Control: post-check=0, pre-check=0', FALSE);
+            header('Cache-Control: no-cache, must-revalidate');
             header('Pragma: no-cache');
         }
 
-        header('Content-Type: application/pdf');
-        header('Content-Length: ' . $size);
+        // Indicates that all or part of the response message is intended for a single user and MUST NOT be cached by a shared cache.
+        // This allows an origin server to state that the specified parts of the response are intended for only one user and are not
+        // a valid response for requests by other users.
+
+        header('Cache-Control: private',false);
         //TODO : sanitize pdf_file_name to prevent file donwload injection attacks
         header('Content-Disposition: attachment; filename="'.$pdf_file_name.'.pdf"');
+        header('Content-Length: ' . $size);
         header('Content-Transfer-Encoding: binary');
         header('Accept-Ranges: bytes');
-        header('Connection: Close');
+        header('Connection: close');
 
         ob_end_clean();
 
@@ -279,14 +299,14 @@ class ParadoxPDF
         $userParameters = $uri->userParameters();
 
         $cacheKeysArray = array('paradoxpdf',
-                                $currentSiteAccess,
-                                $layout,
-                                $actualRequestedURI,
-                                implode( '.', $userParameters ),
-                                implode( '.', $roleList ),
-                                implode( '.', $limitedAssignmentValueList),
-                                implode( '.', $discountList ),
-                                implode( '.', $userKeys ));
+        $currentSiteAccess,
+        $layout,
+        $actualRequestedURI,
+        implode( '.', $userParameters ),
+        implode( '.', $roleList ),
+        implode( '.', $limitedAssignmentValueList),
+        implode( '.', $discountList ),
+        implode( '.', $userKeys ));
 
         return $cacheKeysArray;
 

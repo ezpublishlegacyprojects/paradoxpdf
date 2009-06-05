@@ -114,9 +114,9 @@ Note : You can combine all parameters
  ------------------------------------
 
 By default paradoxpdf handles relative images and css uri.
-But Just notice that the simplest way to have links and images working in your pdf, is to set the absolute uri to them.
+But Just notice that the simplest way to have links and images working in your pdf, is to set the Full (including server name)uri to them.
 The XHTML rendrer will try to load them through HTTP. By this way paradoxpdf can handle ressources stored in Cluster mode.
-If you choose this way, please make sure that your server firewall configuration enables connections through the port 80
+If you choose this way, please make sure that your server firewall configuration allows outgoing http connections
 
 Note : you have to use "&amp;" instead of "&" to indicate an ampersand in the url of external images or css, the rendrer
        will then be able to load properly the image.
