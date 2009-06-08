@@ -107,7 +107,7 @@ then your pass this parameters to paradoxpdf operator
 
 {paradoxpdf($paradoxpdf_params)}
 
-Note : You can combine all parameters
+Note : You can combine some parameters
 
 
 -Image handling and the Cluster mode

@@ -3,23 +3,23 @@ Requires  : eZ Publish 4.x.x (not tested on 3.X but can be easily customised for
 Author    : Mohamed Karnichi karnichi[at]gmail[dot]com
 
 Requirements:
+------------
 
--The extension requires the Java Runtime Environment (JRE) version 1.4 or above
-This can be obtained from the Java download pages. Follow the
-installation instructions for JRE as described on the Java home pages.
+- The extension requires the Java Runtime Environment (JRE) version 1.4 or above
+  This can be obtained from the Java download pages. Follow the
+  installation instructions for JRE as described on the Java home pages.
 
 
-Installation :
-
--Copy paradoxpdf in extension directory
--Regenerate autoloads : php bin/php/ezpgenerateautoloads.php -e
--In  settings/paradoxpdf.ini set your java executable path :
+Installation:
+------------
+- Copy paradoxpdf in extension directory
+- In  settings/paradoxpdf.ini set your java executable path :
     [BinarySettings]
     # *nix example
     JavaExecutable=/usr/bin/java
     # windows example
     JavaExecutable="C:\Program Files\Java\jre6\bin\java.exe"
+- Enable the extension in site.ini
+- Clear the cache
+- Regenerate autoloads : php bin/php/ezpgenerateautoloads.php -e
 
-
--Enable the extension in site.ini
--Clear the cache
