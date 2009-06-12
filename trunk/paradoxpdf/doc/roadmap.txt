@@ -5,8 +5,7 @@ Authors   : Mohamed Karnichi karnichi[at]gmail[dot]com
 
 Coming soon :
 
- - add no caching template parameter
- - add methode to fetch pdf from url (for pdf generation from php code) 
+ - add methode to fetch pdf from url (for pdf generation from php code)
  - Printing Content as PNG  (can be used to generate png images to be loaded from flash application)
 
  Known issues:

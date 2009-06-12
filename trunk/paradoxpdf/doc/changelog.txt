@@ -1,15 +1,14 @@
 V 2.1.2 :
 --------
-    * Fixed http headers 
-        - For ssl mode 
-        - Better file download handeling
-        - Proxy cache (pdf are only cached on browser to avoid serving same pdfs for all users)
-    * Documentation update 
+    * Pdf File name is sanitized to prevet download injection attacks
+    * Fixed http headers issue in ssl mode with IE
+    * Fixed typo DebugPDF=disabled instead of DebugPDF=disabed (thanks to Børge Warvik)
+    * Documentation update
 
 V 2.1.1 :
 --------
 
-    * Updated node/view/pdf.tpl so ($viewmode $language_code $view_parameters 
+    * Updated node/view/pdf.tpl so ($viewmode $language_code $view_parameters
       $collection_attributes $validation, $persistent_variable) still available
       in default node/view/full.tpl
     * Updated Roadmap

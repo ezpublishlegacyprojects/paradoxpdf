@@ -8,16 +8,18 @@ Make link to pdf view :
 -For node content actualy there are two ways :
 
     - point to : content/view/pdf/<nodeID>
-                  this wil automatically load the pdf_export_layout
+                  this wil automatically load the paradoxpdf_layout.tpl layout
                   example : content/view/pdf/2
     - if you are concerned by SEO you cans use  layout/set/pdf/<url_alias>
                   example : layout/set/pdf/Home
-            (be careful with this approach the node/view/full templates will be used instead of node/view/pdf)
+            (be careful with this approach the node/view/full.tpl templates will be used instead of node/view/pdf.pdf
+             but you can add an extra parameter to the url)
 
 -For module views:
 
     - point to : layout/set/pdf/<module_name>/<module_view>/<extra-params>
                example : layout/set/pdf/mymodule/myview/fixedparamter1/(viewparameter1_name)/viewparameter1_value
+                         layout/set/pdf/shop/orderview/4
 
     - or set directly the layout on your module view:
                 $Result['pagelayout'] = 'paradoxpdf_layout.tpl';
@@ -30,10 +32,10 @@ Cusotmize pdf View :
                                 {*set-block variable=$xhtml*}...{*/set-block*}, and check your design in your prefered
                                 browser (firefox recommended). Then when everything looks fine uncomment
                                 the paradoxpdf operator call.
-   -You can customize the pdf view just as any html view : just override the node/view/pdf.tpl
+   -You can customize the pdf view just as any html view : just override the node/view/pdf.tpl (you deal with pdf.tpl not full.tpl)
    -To avoid clearing the pdf cache each time you modify the template to check the pdf, just disable the PDFCache in
     the paradoxpdf.ini But make sure the enable it in production environment.
-   -Fore more information look in : design/templates/pdf_export_layout.tpl
+   -Fore more information take a look to : design/templates/pdf_export_layout.tpl
 
 
 
@@ -46,6 +48,9 @@ paradoxpdf operator :
                                 'subtree_expiry',$subtree_expiry,
                                 'expiry',$expiry ,
                                 'ignore_content_expiry',$ignore_content_expiry))
+               Note : Combining all parameters have no sens : for example, when you set subtree_expiry parameter
+                      the ignore_content_expiry parameter well be automatically set to true by the system, so you
+                      dont have to set it
         -Minium : paradoxpdf(hash('xhtml',$xhtml))
 
   Parameters :
@@ -107,7 +112,7 @@ then your pass this parameters to paradoxpdf operator
 
 {paradoxpdf($paradoxpdf_params)}
 
-Note : You can combine some parameters
+
 
 
 -Image handling and the Cluster mode
@@ -131,6 +136,12 @@ TODO ( Add an extra parameter that sets the base url (SiteUrl) to update all rel
  The Xhtmlrendrer don't have javascript support. However If you want to print google maps in your pdfs you can use the google
  maps static api http://code.google.com/apis/maps/documentation/staticmaps/ witch enables using google maps without javascripts.
 
+
+-Forms support :
+ --------------------
+
+Form elements are ignored during the conversion process. AcroForm support will mabe implemented ont the next releases of XhtmlRenderer.
+For now, on the pdf template you can replace form inputs by some bordered divs or spans elements.
 
 -Access policies:
 -----------------
@@ -157,7 +168,6 @@ Grant access to appropriate users to the pdf function of the content module.
               size: A4 landscape;
             }
 
-            The above example sets the width of the page box to be 297mm and the height to be 210mm.
             The page box in this example should be rendered on a page sheet size of 210 mm by 297 mm.
 
 -How can I embed custom fonts in the pdf ?
@@ -166,7 +176,7 @@ Grant access to appropriate users to the pdf function of the content module.
 You can force custom font embeding by using font parameters  :
 example :
 
-
+First you declare a font-face rule :
     @font-face {
         font-family : "font family name";/*put here font family name example Arial*/
         src: url(path/to/somefont.ttf); /*put here relative path to your font*/
@@ -174,10 +184,10 @@ example :
 
     }
 
-    example for div:
+    then you use as usual your font like this:
 
     div.my_custom_font{
-        font-family : "font family name";/*put here font family name example: Arial*/
+        font-family : "font family name";
     }
 
 You can add as many custom font as you want, for each font add a @font-face rule
@@ -205,21 +215,24 @@ You can add as many custom font as you want, for each font add a @font-face rule
         Identity-H    The Unicode encoding with horizontal writing.
         Identity-V    The Unicode encoding with vertical writing.
 
-    IDENTITY_H and IDENTITY_V are not really encodings.
+    "IDENTITY_H and IDENTITY_V are not really encodings.
     They indicate that the unicode character wil be looked up in the font
     and stored as-is, taking two bytes of space. It's the only way to have
     Asian fonts and some encodings left out by Adobe such as Thai.
     For Europe or the Middle-East, it is better to use an available encoding
     that will store a single byte per character.
     Fonts with IDENTITY_H or IDENTITY_V will always be embedded
-    no matter what you enter as third parameter.
+    no matter what you enter as third parameter."
 
 
 -TOC Table of content And PDF Bookmarks:
 ---------------------------------------
- check the templates :
+In paradoxpdf_layout.tpl uncomment the code that includes paradoxpdf_toc.tpl
+and  paradoxpdf/design/standard/templates/includes/paradoxpdf_bookmarks.tpl
+to see it in action.
+Then check the templates :
    paradoxpdf/design/standard/templates/includes/paradoxpdf_toc.tpl
-   and
+ and
     paradoxpdf/design/standard/templates/includes/paradoxpdf_bookmarks.tpl
  and make your own toc and pdf bookmarks using ezpublish template programming
 
@@ -241,7 +254,7 @@ ____________________________|__________________________________________________
                             |     how deeply nested the inline content is in
                             |     the block.
 ----------------------------+--------------------------------------------------
--fs-page-sequenc            |    values start or auto (the default) and allows
+-fs-page-sequence           |    values start or auto (the default) and allows
                             |     you to limit the scope of the page and pages
                             |     counters to a portion of the document
 ----------------------------+--------------------------------------------------

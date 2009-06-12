@@ -48,7 +48,7 @@ ParadoxPDF Provides All features of Flying Saucer AS :
 
     * Platfom independent : 100% Java XML+CSS layout engine with native PDF output.
     * Strong support for the CSS 2.1 specification including extensions to better support paged media.
-    * Support for XHTML including forms.
+    * Support for XHTML.
     * Arbitrary elements may be replaced with custom content.
     * Some support for PDF specific features (for example, bookmarks and internal links). More coming soon.
 

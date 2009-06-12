@@ -36,6 +36,7 @@ class ParadoxPDF
     private $fileSep;
     private $cacheTTL;
     private $cacheEnabled;
+    private $browserCacheEnabled;
     private $size;
 
 
@@ -43,6 +44,7 @@ class ParadoxPDF
     {
         $paradoxPDFINI = eZINI::instance('paradoxpdf.ini');
         $this->cacheEnabled = ($paradoxPDFINI->variable('CacheSettings', 'PDFCache') == 'enabled');
+        $this->browserCacheEnabled = ($paradoxPDFINI->variable('CacheSettings', 'BrowserCache') == 'enabled');
         $this->debugEnabled = ($paradoxPDFINI->variable('DebugSettings', 'DebugPDF') == 'enabled');
         $this->javaExec =  $paradoxPDFINI->variable('BinarySettings', 'JavaExecutable');
         $this->cacheTTL =  $paradoxPDFINI->variable('CacheSettings','TTL');
@@ -213,14 +215,14 @@ class ParadoxPDF
      * @param $data
      * @param $pdf_file_name
      * @param $size
-     * @param $mtime
-     * @param $expiry
+     * @param $mtime   Not used
+     * @param $expiry  Not used
      * @return void
      */
     public function flushPDF($data, $pdf_file_name='file', $size, $mtime, $expiry)
     {
 
-        //Fixing https issues and forcing file download
+        //Fixing https issues by forcing file download
         $contentType = 'application/octet-stream';
         $userAgent = eZSys::serverVariable( 'HTTP_USER_AGENT' );
 
@@ -234,30 +236,16 @@ class ParadoxPDF
 
         }
 
+        // sanitize pdf_file_name to prevent file donwload injection attacks
+        $pdf_file_name = self::sanitize($pdf_file_name);
+
         ob_clean();
 
         header('X-Powered-By: eZ Publish - ParadoxPDF');
         header('Content-Type: '.$contentType);
-        if($this->cacheEnabled)
-        {
-            header('Expires: ' . gmdate('D, d M Y H:i:s', $mtime + $expiry) . ' GMT');
-            header('Cache-Control: max-age=' . $expiry);
-            header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $mtime) . ' GMT');
-            header('Pragma: cache');
-        }
-        else
-        {
-            header('Expires: Sat, 01 Jan 2000 00:00:00 GMT');
-            header('Cache-Control: no-cache, must-revalidate');
-            header('Pragma: no-cache');
-        }
-
-        // Indicates that all or part of the response message is intended for a single user and MUST NOT be cached by a shared cache.
-        // This allows an origin server to state that the specified parts of the response are intended for only one user and are not
-        // a valid response for requests by other users.
-
-        header('Cache-Control: private',false);
-        //TODO : sanitize pdf_file_name to prevent file donwload injection attacks
+        header('Expires: Sat, 03 Jan 1970 00:00:00 GMT');
+        header('Cache-Control: private');
+        header('Pragma: private',false);
         header('Content-Disposition: attachment; filename="'.$pdf_file_name.'.pdf"');
         header('Content-Length: ' . $size);
         header('Content-Transfer-Encoding: binary');
@@ -377,6 +365,18 @@ class ParadoxPDF
         }
         return $status;
     }
+
+     /**
+     *  Removes any non-alphanumeric characters.
+     *
+     * @param  String
+     * @return String sanitized string
+     */
+     static function sanitize( $string)
+     {
+         $sanitized = preg_replace("/[^a-zA-Z0-9_-]/", '', $string);
+         return $sanitized;
+     }
 
 }
 ?>
