@@ -36,7 +36,6 @@ class ParadoxPDF
     private $fileSep;
     private $cacheTTL;
     private $cacheEnabled;
-    private $browserCacheEnabled;
     private $size;
 
 
@@ -44,7 +43,6 @@ class ParadoxPDF
     {
         $paradoxPDFINI = eZINI::instance('paradoxpdf.ini');
         $this->cacheEnabled = ($paradoxPDFINI->variable('CacheSettings', 'PDFCache') == 'enabled');
-        $this->browserCacheEnabled = ($paradoxPDFINI->variable('CacheSettings', 'BrowserCache') == 'enabled');
         $this->debugEnabled = ($paradoxPDFINI->variable('DebugSettings', 'DebugPDF') == 'enabled');
         $this->javaExec =  $paradoxPDFINI->variable('BinarySettings', 'JavaExecutable');
         $this->cacheTTL =  $paradoxPDFINI->variable('CacheSettings','TTL');
