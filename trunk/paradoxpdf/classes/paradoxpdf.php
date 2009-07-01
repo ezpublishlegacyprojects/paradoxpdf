@@ -165,7 +165,7 @@ class ParadoxPDF
 
         eZFile::create($tmpXHTMLFile, false, $xhtml) ;
 
-        $pdfConent = '';
+        $pdfContent = '';
 
         //run jar in headless mode
         $command = $this->javaExec." -Djava.awt.headless=true";
