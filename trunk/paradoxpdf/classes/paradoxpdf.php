@@ -198,7 +198,7 @@ class ParadoxPDF
         //if debug enabled preseves the temporary pdf file
         //else remove all temporary files
 
-        if(!$debugEnabled)
+        if(!$this->debugEnabled)
         {
             eZFileHandler::unlink($tmpPDFFile);
             eZFileHandler::unlink($tmpXHTMLFile);
