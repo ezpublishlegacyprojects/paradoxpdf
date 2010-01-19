@@ -86,7 +86,6 @@ class ParadoxPDF
 
         if($this->cacheEnabled)
         {
-            $use_global_expiry = !$ignore_content_expiry;
 
             $keys = self::getCacheKeysArray($keys);
 
@@ -97,7 +96,12 @@ class ParadoxPDF
                 $httpExpiry = $expiry;
             }
 
-            list($handler, $data) = eZTemplateCacheBlock::retrieve($keys, $subtree_expiry, $expiry, $use_global_expiry);
+            if(is_set($subtree_expiry)){
+
+                $ignore_content_expiry =  true;
+            }
+
+            list($handler, $data) = eZTemplateCacheBlock::retrieve($keys, $subtree_expiry, $expiry, !$ignore_content_expiry);
 
             if ($data instanceof eZClusterFileFailure)
             {
@@ -364,17 +368,17 @@ class ParadoxPDF
         return $status;
     }
 
-     /**
+    /**
      *  Removes any non-alphanumeric characters.
      *
      * @param  String
      * @return String sanitized string
      */
-     static function sanitize( $string)
-     {
-         $sanitized = preg_replace("/[^a-zA-Z0-9_-]/", '', $string);
-         return $sanitized;
-     }
+    static function sanitize( $string)
+    {
+        $sanitized = preg_replace("/[^a-zA-Z0-9_-]/", '', $string);
+        return $sanitized;
+    }
 
 }
 ?>

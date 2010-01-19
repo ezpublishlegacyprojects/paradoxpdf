@@ -1,6 +1,6 @@
 V 2.1.2 :
 --------
-    * Pdf File name is sanitized to prevent download injection attacks
+    * PDF File name is sanitized to prevent download injection attacks
     * Fixed http headers issue in ssl mode with IE
     * Fixed typo DebugPDF=disabled instead of DebugPDF=disabed (thanks to Børge Warvik)
     * Documentation update

@@ -12,8 +12,8 @@ It'is platform independant, easy to use and performant.
 Why ParadoxPDF?
 ---------------
 
-I Love eZPublish. As you know PDF support is deprecated. So we need a handy way to serve content as PDF files.
-As Ihave left my curret Emplyer, I have time to make some useful things :
+I Love eZ Publish. As you know PDF support is deprecated. So we need a handy way to serve content as PDF files.
+As I have left my current Employer, I have time to make some useful things :
 ParadoxPDF is a simple and efficient way to generate pdf files from xhtml+CSS.
 
 
@@ -30,10 +30,10 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 
-ParadoxPDF uses a java jar : paradoxpdf.jar built uppon 'Flying Saucer'https://xhtmlrenderer.dev.java.net/
-Flying saucer is  An XML/XHTML/CSS 2.1 Rendrer that supports a native PDF output support.
+ParadoxPDF uses a java jar : paradoxpdf.jar built upon 'Flying Saucer' https://xhtmlrenderer.dev.java.net/
+Flying saucer is a XML/XHTML/CSS 2.1 Renderer that supports a native PDF output support.
 
-Paradoxpdf.jar is a wrapper application that can be used from command line. Is contains all deppendencies.
+Paradoxpdf.jar is a wrapper application that can be used from command line. Is contains all dependencies.
 and sources will be soon published on sourcefoge.net
 
 The original idea for using 'Flying Saucer' to generate pdf contents was published by Joshua Marinacci to
@@ -44,20 +44,19 @@ http://today.java.net/pub/a/today/2007/06/26/generating-pdfs-with-flying-saucer-
 ParadoxPDF features
 -------------------
 
-ParadoxPDF Provides All features of Flying Saucer AS :
+ParadoxPDF provides all features of Flying Saucer as :
 
-    * Platfom independent : 100% Java XML+CSS layout engine with native PDF output.
+    * Platform independent : 100% Java XML+CSS layout engine with native PDF output.
     * Strong support for the CSS 2.1 specification including extensions to better support paged media.
     * Support for XHTML.
     * Arbitrary elements may be replaced with custom content.
     * Some support for PDF specific features (for example, bookmarks and internal links). More coming soon.
 
-In Plus :
-
-    * Just EASY : Prepare your designs (just as any html design) for the PDF View and let's the magic beggins
+In addition :
+    * Easy : Prepare your designs just as any html design for the PDF View and let the magic happen
     * Multipage generation and page break-support (with custom header and footer)
     * Good performance (better than Apache FOP).
-    * Cache : You can manage PDF caches As Template Cache-blocs look docs/documentation.txt (cluster compatible)
+    * Cache : You can manage PDF caches as template cache-blocks look doc/doc.txt (cluster compatible)
 
 
 Installation
@@ -69,14 +68,14 @@ Look at the comments and sample code in design/templates/paradox_pdf_layout.tpl
 Requirements
 ------------
 
--The extension requires the Java Runtime Environment (JRE) version 1.4 or above
+The extension requires the Java Runtime Environment (JRE) version 1.4 or above
 This can be obtained from the Java download pages. Follow the
 installation instructions for JRE as described on the Java home pages.
 
 
 Where to get more help
 ----------------------
-- look en the extension doc folder
-- look at proejct page/forum :http://projects.ez.no/paradoxpdf/forum
+- look in the extension doc folder
+- look at project page/forum :http://projects.ez.no/paradoxpdf/forum
 
 
