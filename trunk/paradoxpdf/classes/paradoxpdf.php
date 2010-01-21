@@ -96,7 +96,7 @@ class ParadoxPDF
                 $httpExpiry = $expiry;
             }
 
-            if(is_set($subtree_expiry)){
+            if(isset($subtree_expiry)){
 
                 $ignore_content_expiry =  true;
             }
