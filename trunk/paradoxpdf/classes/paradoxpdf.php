@@ -103,7 +103,7 @@ class ParadoxPDF
 
             list($handler, $data) = eZTemplateCacheBlock::retrieve($keys, $subtree_expiry, $expiry, !$ignore_content_expiry);
 
-            if ($data instanceof eZClusterFileFailure)
+            if ($data instanceof eZClusterFileFailure || $handler->size() == 0)
             {
                 $data = $this->generatePDF($xhtml);
 
