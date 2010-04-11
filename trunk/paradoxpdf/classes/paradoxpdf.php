@@ -31,9 +31,9 @@ class ParadoxPDF
     private $paradoxPDFExec ;
     private $paradoxPDFExtensionDir;
     private $debugEnabled;
+    private $debugVerbose;
     private $javaExec;
     private $tmpDir;
-    private $fileSep;
     private $cacheTTL;
     private $cacheEnabled;
     private $size;
@@ -44,13 +44,11 @@ class ParadoxPDF
         $paradoxPDFINI = eZINI::instance('paradoxpdf.ini');
         $this->cacheEnabled = ($paradoxPDFINI->variable('CacheSettings', 'PDFCache') == 'enabled');
         $this->debugEnabled = ($paradoxPDFINI->variable('DebugSettings', 'DebugPDF') == 'enabled');
+        $this->debugVerbose = ($paradoxPDFINI->variable('DebugSettings', 'Verbose') == 'enabled');
         $this->javaExec =  $paradoxPDFINI->variable('BinarySettings', 'JavaExecutable');
         $this->cacheTTL =  $paradoxPDFINI->variable('CacheSettings','TTL');
-        $fileSep = eZSys::fileSeparator();
-        $this->fileSep = $fileSep;
-        $this->paradoxPDFExtensionDir = eZSys::rootDir().$fileSep.eZExtension::baseDirectory().$fileSep.'paradoxpdf';
-        $this->paradoxPDFExec = $this->paradoxPDFExtensionDir.$fileSep.'bin'.$fileSep.'paradoxpdf.jar';
-        $this->tmpDir = eZSys::rootDir().$fileSep.'var'.$fileSep.'paradoxpdf';
+        $this->paradoxPDFExec = eZDir::cleanPath('extension/paradoxpdf/bin/paradoxpdf.jar');
+        $this->tmpDir = eZDir::path(array(eZINI::instance()->variable( 'FileSettings', 'VarDir' ),'paradoxpdf'));
     }
 
     /**
@@ -161,8 +159,8 @@ class ParadoxPDF
         }
 
         $rand = md5('paradoxpdf'. getmypid() . mt_rand());
-        $tmpXHTMLFile = $this->tmpDir.$this->fileSep.$rand.'.xhtml';
-        $tmpPDFFile = $this->tmpDir.$this->fileSep.$rand.'.pdf';
+        $tmpXHTMLFile = eZDir::path(array($this->tmpDir, "$rand.xhtml"));
+        $tmpPDFFile = eZDir::path(array($this->tmpDir, "$rand.pdf"));
 
         //fix relative urls to match ez root directory
         $xhtml = $this->fixURL($xhtml);
@@ -174,7 +172,7 @@ class ParadoxPDF
         //run jar in headless mode
         $command = $this->javaExec." -Djava.awt.headless=true";
 
-        if($this->debugEnabled)
+        if($this->debugEnabled && $this->debugVerbose)
         {
             $command .= " -Dxr.util-logging.loggingEnabled=true";
         }
@@ -256,7 +254,7 @@ class ParadoxPDF
 
         ob_end_clean();
 
-        print($data);
+        echo $data;
 
         eZExecution::cleanExit();
     }
@@ -333,12 +331,15 @@ class ParadoxPDF
      *  Make image and css urls relative to ezpublish root directory
      *
      * @param $html String
+     * @param $absolute Boolean Generate absolute urls
      * @return String html with fixed urls
      */
 
-    private function fixURL($html)
+    private function fixURL($html,$relative=false)
     {
-        $htmlfixed = preg_replace('#(href|src)\s*=\s*["\'](?!https?|mailto)(\/?)(.*\..{2,4})["\']#i', '$1="../../$3"', $html);
+        $base_url = $relative ? '../..' : eZSys::serverURL() ;
+        $htmlfixed = preg_replace('#(<\s*(a|img|link)\s+[^>]*(href|src)\s*=\s*["\'])/?([^:"\'>]*)(["\'])#i', '$1'.$base_url.'/$4$5', $html);
+        #$htmlfixed = preg_replace('#(@import)?\s*(url)?\s*(\()?\s*["\']/?([^"\'\);]*)["\']?\s*(\))?\s*;#i','$1 $2 $3"'.$base_url.'/$4"$5',$htmlfixed);
         return $htmlfixed;
     }
 
@@ -377,7 +378,8 @@ class ParadoxPDF
     static function sanitize( $string)
     {
         $sanitized = preg_replace("/[^a-zA-Z0-9_-]/", '', $string);
-        return $sanitized;
+        $transformed= eZURLAliasML::convertToAlias( $sanitized );
+        return $transformed;
     }
 
 }

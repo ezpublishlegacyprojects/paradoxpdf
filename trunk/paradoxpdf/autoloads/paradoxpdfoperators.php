@@ -60,7 +60,7 @@ class ParadoxPDFOperators
 
         if( isset($moduleResult['node_id']) && !ParadoxPDF::canPDFNode($moduleResult['node_id']))
         {
-            $operatorValue = ezi18n( 'design/standard/error/kernel', 'Access denied' );
+            $operatorValue = ezpI18n::tr( 'design/standard/error/kernel', 'Access denied!' );
             return;
         }
 
